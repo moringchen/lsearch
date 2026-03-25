@@ -127,18 +127,14 @@ auto_expand_links: true
 当用户问题包含特定关键词时，自动搜索知识库：
 
 **触发关键词：**
-- 文档相关："docs", "documentation", "文档"
-- 架构相关："architecture", "设计", "架构"
-- API相关："api", "interface", "接口"
-- 部署相关："deploy", "deployment", "部署"
-- 配置相关："config", "configuration", "配置"
-- 流程相关："how to", "流程", "怎么", "如何"
+- "知识库" / "knowledge base"
+- "自动搜索" / "auto search"
 
 **自动触发示例：**
-- "What's the deployment process?" → 自动搜索
-- "怎么配置数据库？" → 自动搜索
-- "API documentation" → 自动搜索
-- "项目架构是什么样的？" → 自动搜索
+- "Search knowledge base for auth" → 自动搜索
+- "自动搜索部署文档" → 自动搜索
+- "Use knowledge base" → 自动搜索
+- "请自动搜索相关文档" → 自动搜索
 
 **工作原理：**
 1. 检测用户查询中的关键词

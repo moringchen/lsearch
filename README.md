@@ -120,6 +120,25 @@ Once configured, use these triggers in Claude Code:
 | `/lsearch-add <path>` | Add temporary path for session | `/lsearch-add ~/notes` |
 | `/lsearch-stats` | Show knowledge base statistics | `/lsearch-stats` |
 
+### Keyword-Based Auto-Trigger
+
+When the user asks questions containing specific keywords, automatically search the knowledge base:
+
+**Trigger Keywords:**
+- "knowledge base" / "知识库"
+- "auto search" / "自动搜索"
+
+**Examples of auto-trigger:**
+- "Search knowledge base for auth" → Auto-search
+- "自动搜索部署文档" → Auto-search
+- "Use knowledge base" → Auto-search
+- "请自动搜索相关文档" → Auto-search
+
+**How it works:**
+1. Detect keywords in user query
+2. Automatically call `mcp__lsearch__search_with_context`
+3. Include results in response
+
 ## How It Works
 
 ```
