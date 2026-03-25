@@ -1,0 +1,28 @@
+{
+  "name": "my-custom-marketplace",
+  "version": "1.0.0",
+  "description": "Custom marketplace for my team/family's Claude Code skills",
+  "author": {
+    "name": "Your Name",
+    "email": "your@email.com"
+  },
+  "skills": [
+    {
+      "name": "lsearch",
+      "description": "Local RAG knowledge base for Claude Code - search your project docs with semantic + keyword hybrid search",
+      "source": {
+        "source": "github",
+        "repo": "moringchen/lsearch",
+        "ref": "main"
+      },
+      "entry": {
+        "skill": ".claude/skills/lsearch/SKILL.md",
+        "commands": ".claude/commands",
+        "mcp": {
+          "serverName": "lsearch",
+          "command": ["python", "-m", "lsearch.server"]
+        }
+      }
+    }
+  ]
+}
