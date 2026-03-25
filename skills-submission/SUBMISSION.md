@@ -108,12 +108,33 @@ MIT License
 
 ## How to Submit
 
-1. Visit: https://skills.sh/submit
-2. Or create an issue at: https://github.com/skills-sh/registry/issues
-3. Include this template in your submission
+> ⚠️ **Note:** skills.sh currently does not have a public submission form. Here are alternative approaches:
+
+### Option 1: Direct Installation (Recommended for Now)
+Users can install lsearch directly without it being indexed:
+
+```bash
+npx skills add moringchen/lsearch -g
+```
+
+### Option 2: Contact Skills.sh Team
+Try reaching out through:
+- Claude Code Discord community
+- Anthropic support channels
+- GitHub Discussions in related repositories
+
+### Option 3: Create Issue in Community Registry
+Some community members maintain unofficial registries. Search for:
+- `skills-registry` on GitHub
+- `claude-code-skills` topics
+
+### Option 4: Self-Hosted Marketplace
+Use the `example-marketplace/` in this repo to create your own marketplace for your team.
 
 ---
 
 **Submission Date:** _YYYY-MM-DD_
 
 **Submitter:** _Your Name/Handle_
+
+**Status:** ⏳ Waiting for skills.sh to open public submissions
