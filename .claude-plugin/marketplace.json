@@ -1,0 +1,42 @@
+{
+  "name": "lsearch",
+  "version": "0.1.0",
+  "description": "Local RAG knowledge base for Claude Code - semantic + keyword hybrid search",
+  "author": {
+    "name": "moringchen",
+    "email": "843115404@qq.com",
+    "url": "https://github.com/moringchen"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moringchen/lsearch.git"
+  },
+  "keywords": [
+    "rag",
+    "search",
+    "knowledge-base",
+    "mcp",
+    "semantic-search",
+    "chinese"
+  ],
+  "skills": [
+    {
+      "name": "lsearch",
+      "description": "Local RAG knowledge base for Claude Code",
+      "source": {
+        "source": "pip",
+        "package": "lsearch",
+        "version": ">=0.1.0"
+      },
+      "entry": {
+        "skill": ".claude/skills/lsearch/SKILL.md",
+        "commands": ".claude/commands",
+        "mcp": {
+          "serverName": "lsearch",
+          "command": ["python", "-m", "lsearch.server"]
+        }
+      }
+    }
+  ]
+}

@@ -53,7 +53,21 @@ Then manually add to `~/.claude/settings.json`:
 }
 ```
 
-### Option 3: Development Install
+### Option 3: Skills CLI (npx skills)
+
+Install via the Skills CLI from [skills.sh](https://skills.sh):
+
+```bash
+# Install lsearch skill
+npx skills add moringchen/lsearch -g
+
+# Or install from PyPI via skills
+npx skills add moringchen/lsearch@pip -g
+```
+
+The `-g` flag installs globally (user-level).
+
+### Option 4: Development Install
 
 ```bash
 git clone https://github.com/moringchen/lsearch.git

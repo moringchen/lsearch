@@ -17,6 +17,7 @@
 - ⚡ **快速响应** - 纯本地运行，索引热加载
 - 📝 **智能上下文** - 基于 Token 的上下文构建，支持交互式选择
 - 🎯 **多种触发方式** - 支持 `lsearch:`、`@kb` 或斜杠命令
+- 🎯 **关键词自动触发** - 智能检测知识查询意图
 
 ## 安装
 
@@ -53,7 +54,21 @@ pip install lsearch
 }
 ```
 
-### 方式 3：开发安装
+### 方式 3：Skills CLI (npx skills)
+
+通过 Skills CLI 从 [skills.sh](https://skills.sh) 安装：
+
+```bash
+# 安装 lsearch skill
+npx skills add moringchen/lsearch -g
+
+# 或通过 PyPI 安装
+npx skills add moringchen/lsearch@pip -g
+```
+
+`-g` 标志表示全局安装（用户级别）。
+
+### 方式 4：开发安装
 
 ```bash
 git clone https://github.com/moringchen/lsearch.git
@@ -87,7 +102,7 @@ paths:
     session_only: false
   - path: ./README.md
     session_only: false
-embedding_model: all-MiniLM-L6-v2
+embedding_model: bge-small-zh  # 默认：中文优化
 token_limit: 4000
 auto_expand_links: true
 ```
@@ -100,11 +115,35 @@ auto_expand_links: true
 |---------|------|------|
 | `lsearch: <查询>` | 自动触发 RAG 搜索 | `lsearch: 认证如何工作？` |
 | `@kb <查询>` | 强制触发知识库搜索 | `@kb 部署流程` |
+| **关键词触发** | 特定关键词自动触发 | 见下方 |
 | `/lsearch <查询>` | 通过斜杠命令搜索 | `/lsearch API 文档` |
 | `/lsearch-index` | 手动触发索引 | `/lsearch-index` |
 | `/lsearch-fetch <url>` | 抓取并索引网页 | `/lsearch-fetch https://docs.example.com` |
 | `/lsearch-add <路径>` | 为当前会话添加临时路径 | `/lsearch-add ~/notes` |
 | `/lsearch-stats` | 显示知识库统计信息 | `/lsearch-stats` |
+
+### 关键词自动触发
+
+当用户问题包含特定关键词时，自动搜索知识库：
+
+**触发关键词：**
+- 文档相关："docs", "documentation", "文档"
+- 架构相关："architecture", "设计", "架构"
+- API相关："api", "interface", "接口"
+- 部署相关："deploy", "deployment", "部署"
+- 配置相关："config", "configuration", "配置"
+- 流程相关："how to", "流程", "怎么", "如何"
+
+**自动触发示例：**
+- "What's the deployment process?" → 自动搜索
+- "怎么配置数据库？" → 自动搜索
+- "API documentation" → 自动搜索
+- "项目架构是什么样的？" → 自动搜索
+
+**工作原理：**
+1. 检测用户查询中的关键词
+2. 自动调用 `mcp__lsearch__search_with_context`
+3. 将结果包含在回复中
 
 ## 工作原理
 
