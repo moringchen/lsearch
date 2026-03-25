@@ -1,0 +1,36 @@
+# lsearch 知识库配置
+name: locrag
+
+# 知识库路径（相对于项目根目录）
+paths:
+  - path: ./docs          # 文档目录
+    session_only: false
+  - path: ./README.md     # 项目说明
+    session_only: false
+  - path: ./CLAUDE.md     # Claude 配置说明
+    session_only: false
+
+# 排除的文件/目录
+exclude:
+  - node_modules/**
+  - .git/**
+  - __pycache__/**
+  - *.pyc
+  - .venv/**
+  - dist/**
+  - build/**
+
+# 嵌入模型选择
+# - all-MiniLM-L6-v2: 英文，70MB，速度快
+# - bge-small-zh: 中文优化，300MB
+embedding_model: all-MiniLM-L6-v2
+
+# 上下文 token 限制
+token_limit: 4000
+
+# 自动展开链接的笔记
+auto_expand_links: true
+
+# 分块配置
+chunk_size: 500        # 每块字数
+chunk_overlap: 50      # 块之间重叠字数

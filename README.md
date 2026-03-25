@@ -2,6 +2,9 @@
 
 [![PyPI version](https://badge.fury.io/py/lsearch.svg)](https://badge.fury.io/py/lsearch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+**English** | [中文](README.zh.md)
 
 Local RAG (Retrieval-Augmented Generation) knowledge base for Claude Code. Search your project documentation using hybrid semantic + keyword search.
 
@@ -13,6 +16,7 @@ Local RAG (Retrieval-Augmented Generation) knowledge base for Claude Code. Searc
 - 🤖 **Local Models** - Uses small embedding models (70-300MB), no cloud dependencies
 - ⚡ **Fast** - Pure local operation with hot-loaded indices
 - 📝 **Smart Context** - Token-aware context building with interactive selection
+- 🎯 **Multiple Triggers** - Use `lsearch:`, `@kb`, or slash commands
 
 ## Installation
 
@@ -80,79 +84,55 @@ token_limit: 4000
 auto_expand_links: true
 ```
 
-### 2. Configure Claude Code
-
-Add to `~/.claude/settings.json`:
-
-```json
-{
-  "mcpServers": {
-    "lsearch": {
-      "command": "python",
-      "args": ["-m", "lsearch.server"]
-    }
-  }
-}
-```
-
-### 3. Use in Claude Code
+### 2. Use in Claude Code
 
 Once configured, use these triggers in Claude Code:
 
-- `lsearch: How does authentication work?` - Automatic RAG search
-- `@kb authentication flow` - Force knowledge base search
-
-Or use commands:
-
-- `/lsearch-index` - Index your documentation
-- `/lsearch-fetch https://api.example.com/docs` - Fetch and index a web page
-- `/lsearch-add /path/to/notes` - Add temporary path for this session
+| Trigger | Description | Example |
+|---------|-------------|---------|
+| `lsearch: <query>` | Automatic RAG search | `lsearch: How does auth work?` |
+| `@kb <query>` | Force knowledge base search | `@kb deployment process` |
+| `/lsearch <query>` | Search via slash command | `/lsearch API documentation` |
+| `/lsearch-index` | Manually trigger indexing | `/lsearch-index` |
+| `/lsearch-fetch <url>` | Fetch and index web page | `/lsearch-fetch https://docs.example.com` |
+| `/lsearch-add <path>` | Add temporary path for session | `/lsearch-add ~/notes` |
+| `/lsearch-stats` | Show knowledge base statistics | `/lsearch-stats` |
 
 ## How It Works
 
-### Indexing
-
 ```
-Markdown Files
-      ↓
-[Document Processor] → Chunks + Wiki-links
-      ↓
-┌─────────────┬─────────────┬─────────────┐
-│   Chroma    │    BM25     │ Link Graph  │
-│   (Vector)  │  (Keyword)  │  (NetworkX) │
-└─────────────┴─────────────┴─────────────┘
-      ↓
-~/.lsearch/indices/{project-name}/
+Markdown Files → Chunks → Vector Index (Chroma) + BM25 Index + Link Graph
+                                              ↓
+                                    Hybrid Search (RRF Fusion)
+                                              ↓
+                                     Context Builder → Claude
 ```
 
-### Searching
+### Indexing Process
 
-1. **Vector Search** - Semantic similarity using embeddings
+1. **Document Processing** - Markdown files are parsed, frontmatter extracted, wiki-links identified
+2. **Chunking** - Documents split into overlapping chunks (default 500 words)
+3. **Embedding** - Each chunk embedded using local models (all-MiniLM-L6-v2 or bge-small-zh)
+4. **Indexing** - Stored in Chroma (vector) + Whoosh (BM25) + NetworkX (link graph)
+
+### Search Process
+
+1. **Vector Search** - Semantic similarity using cosine distance
 2. **BM25 Search** - Keyword matching with term frequency
-3. **RRF Fusion** - Reciprocal Rank Fusion combines both
-4. **Link Expansion** - Include linked notes
-5. **Context Building** - Token-aware assembly
+3. **RRF Fusion** - Reciprocal Rank Fusion combines both results
+4. **Link Expansion** - Include linked notes if enabled
+5. **Context Building** - Assemble results respecting token limits
 
-## Embedding Models
+## Configuration
 
-| Model | Size | Best For |
-|-------|------|----------|
-| `all-MiniLM-L6-v2` | 70MB | English general purpose |
-| `bge-small-zh` | 300MB | Chinese optimized |
-| `bge-small-en` | 130MB | English optimized |
-
-Change in config:
-
-```yaml
-embedding_model: bge-small-zh
-```
-
-## Configuration Options
+### Config File (`.lsearch/config.yaml`)
 
 ```yaml
 name: my-project                          # Knowledge base name
 paths:                                    # Paths to index
   - path: ./docs
+    session_only: false
+  - path: ./README.md
     session_only: false
 exclude:                                  # Patterns to exclude
   - node_modules/**
@@ -165,22 +145,30 @@ chunk_size: 500                           # Words per chunk
 chunk_overlap: 50                         # Overlap between chunks
 ```
 
+### Embedding Models
+
+| Model | Size | Best For | Language |
+|-------|------|----------|----------|
+| `all-MiniLM-L6-v2` | 70MB | General purpose | English |
+| `bge-small-zh` | 300MB | Optimized for Chinese | Chinese |
+| `bge-small-en` | 130MB | Optimized for English | English |
+
 ## CLI Commands
 
 ```bash
 # Initialize a knowledge base
 lsearch init --name my-project --path ./docs
 
-# Add paths
+# Add paths to existing knowledge base
 lsearch add-path ./more-docs
 
-# Check status
+# Check status and statistics
 lsearch status
 
-# List available models
+# List available embedding models
 lsearch models
 
-# Run MCP server (for Claude Code)
+# Run MCP server (for Claude Code integration)
 lsearch server
 ```
 
@@ -193,30 +181,39 @@ Fetch and index web documentation:
 ```
 
 Supports:
-- HTML documentation → Markdown
-- Swagger/OpenAPI JSON → Markdown
-- Auto title extraction
+- **HTML** → Markdown conversion
+- **Swagger/OpenAPI JSON** → Markdown
+- **Auto title extraction**
+
+Fetched documents are stored in `~/.lsearch/fetched/` and indexed.
 
 ## Project Structure
 
 ```
 lsearch/
 ├── src/lsearch/
-│   ├── server.py              # MCP Server
+│   ├── server.py              # MCP Server (main entry)
 │   ├── cli.py                 # CLI commands
-│   ├── config.py              # Configuration
+│   ├── config.py              # Configuration management
 │   ├── embedding.py           # Embedding models
 │   ├── document_processor.py  # Markdown processing
 │   ├── fetcher.py             # URL fetching
 │   ├── indexers/
-│   │   ├── chroma_indexer.py  # Vector database
-│   │   ├── bm25_indexer.py    # Keyword index
-│   │   └── link_graph.py      # Note relationships
+│   │   ├── chroma_indexer.py  # Vector database (Chroma)
+│   │   ├── bm25_indexer.py    # Keyword index (Whoosh)
+│   │   └── link_graph.py      # Note relationships (NetworkX)
 │   └── search/
 │       ├── hybrid_search.py   # RRF fusion
 │       └── context_builder.py # Token management
-├── skill/SKILL.md             # Claude Code skill definition
-└── tests/
+├── .claude/
+│   ├── commands/              # Slash commands
+│   └── skills/                # Skill definition
+├── skill/
+│   └── SKILL.md               # Claude Code skill definition
+├── install.py                 # Installation script
+├── README.md                  # This file
+├── README.zh.md               # Chinese documentation
+└── pyproject.toml             # Package configuration
 ```
 
 ## Development
@@ -225,13 +222,48 @@ lsearch/
 # Setup
 pip install -e ".[dev]"
 
-# Format
+# Format code
 black src/ tests/
 ruff check src/ tests/
 
-# Test
+# Run tests
 pytest
+
+# Type checking
+mypy src/
 ```
+
+## Troubleshooting
+
+### Issue: MCP server not starting
+
+**Solution**: Check if lsearch is installed:
+```bash
+python -m lsearch.server --version
+```
+
+If not installed, run:
+```bash
+pip install lsearch
+```
+
+### Issue: No search results
+
+**Solution**: Ensure documents are indexed:
+```bash
+/lsearch-index
+```
+
+Or check index status:
+```bash
+/lsearch-stats
+```
+
+### Issue: Model download fails
+
+**Solution**: Embedding models are downloaded on first use. Ensure you have:
+- Internet connection (first time only)
+- ~300MB disk space for Chinese model, ~70MB for English
 
 ## License
 
@@ -247,3 +279,8 @@ Contributions welcome! Please open an issue or PR.
 - [Whoosh](https://whoosh.readthedocs.io/) - BM25 indexing
 - [sentence-transformers](https://www.sbert.net/) - Embeddings
 - [MCP](https://modelcontextprotocol.io/) - Model Context Protocol
+
+## Contact
+
+- GitHub: [@moringchen](https://github.com/moringchen)
+- Email: 843115404@qq.com
