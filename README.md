@@ -16,11 +16,40 @@ Local RAG (Retrieval-Augmented Generation) knowledge base for Claude Code. Searc
 
 ## Installation
 
+### Option 1: Claude Code Plugin (Recommended)
+
+Install as a Claude Code plugin with automatic MCP configuration:
+
+```bash
+# Clone to Claude plugins directory
+git clone https://github.com/moringchen/lsearch.git ~/.claude/plugins/lsearch
+
+# Run install script
+cd ~/.claude/plugins/lsearch && python install.py
+```
+
+Then restart Claude Code.
+
+### Option 2: PyPI
+
 ```bash
 pip install lsearch
 ```
 
-Or install from source:
+Then manually add to `~/.claude/settings.json`:
+
+```json
+{
+  "mcpServers": {
+    "lsearch": {
+      "command": "python",
+      "args": ["-m", "lsearch.server"]
+    }
+  }
+}
+```
+
+### Option 3: Development Install
 
 ```bash
 git clone https://github.com/moringchen/lsearch.git

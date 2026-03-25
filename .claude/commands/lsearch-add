@@ -1,0 +1,32 @@
+# lsearch-add - Add Temporary Path
+
+Add a temporary path to the current session's knowledge base.
+
+## Usage
+
+```
+/lsearch-add <path>
+```
+
+## Arguments
+
+- `path` (required): Path to add (file or directory)
+
+## Description
+
+Adds a path that is only valid for the current Claude Code session. The path will not persist after the session ends.
+
+Use this for:
+- Referencing other projects' documentation
+- Including personal notes for a specific task
+- Temporarily adding external resources
+
+## Examples
+
+```bash
+# Add another project's docs
+/lsearch-add ~/projects/other-project/docs
+
+# Add personal notes
+/lsearch-add ~/notes/project-ideas.md
+```

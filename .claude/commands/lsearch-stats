@@ -1,0 +1,23 @@
+# lsearch-stats - Knowledge Base Statistics
+
+Display statistics about the knowledge base.
+
+## Usage
+
+```
+/lsearch-stats
+```
+
+## Output
+
+Shows:
+- Vector index (Chroma) document count
+- BM25 keyword index document count
+- Link graph statistics (notes and links)
+- Configuration summary
+
+## Examples
+
+```bash
+/lsearch-stats
+```
