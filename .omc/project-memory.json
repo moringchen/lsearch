@@ -91,15 +91,21 @@
       "type": "file"
     },
     {
+      "path": "src/lsearch/config.py",
+      "accessCount": 5,
+      "lastAccessed": 1774433362963,
+      "type": "file"
+    },
+    {
       "path": "skills-submission/SUBMISSION.md",
       "accessCount": 4,
       "lastAccessed": 1774431338812,
       "type": "file"
     },
     {
-      "path": "src/lsearch/config.py",
-      "accessCount": 3,
-      "lastAccessed": 1774428654763,
+      "path": ".lsearch/config.yaml",
+      "accessCount": 4,
+      "lastAccessed": 1774433281290,
       "type": "file"
     },
     {
@@ -116,14 +122,8 @@
     },
     {
       "path": "docs/test.md",
-      "accessCount": 2,
-      "lastAccessed": 1774427164374,
-      "type": "file"
-    },
-    {
-      "path": ".lsearch/config.yaml",
-      "accessCount": 1,
-      "lastAccessed": 1774427020987,
+      "accessCount": 3,
+      "lastAccessed": 1774432228215,
       "type": "file"
     },
     {
@@ -143,6 +143,12 @@
       "accessCount": 1,
       "lastAccessed": 1774430680597,
       "type": "file"
+    },
+    {
+      "path": "docs",
+      "accessCount": 1,
+      "lastAccessed": 1774432216596,
+      "type": "directory"
     }
   ],
   "userDirectives": []

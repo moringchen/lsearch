@@ -38,7 +38,11 @@
       "Bash(pip install:*)",
       "Bash(lsearch init:*)",
       "Bash(cp -r .claude/skills/lsearch ~/.claude/skills/)",
-      "WebFetch(domain:skills.sh)"
+      "WebFetch(domain:skills.sh)",
+      "Bash(lsearch status:*)",
+      "mcp__plugin_claude-mem_mcp-search____IMPORTANT",
+      "Bash(lsearch index:*)",
+      "Bash(lsearch --version)"
     ]
   }
 }

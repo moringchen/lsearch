@@ -52,15 +52,27 @@ class Config:
             else:
                 paths.append(PathConfig(path=p))
 
+        # Get default exclude patterns from a temporary instance
+        default_excludes = [
+            "node_modules/**",
+            ".git/**",
+            "__pycache__/**",
+            "*.pyc",
+            ".env",
+            ".venv/**",
+            "dist/**",
+            "build/**",
+        ]
+
         return cls(
             name=data.get("name", "default"),
             paths=paths,
-            exclude_patterns=data.get("exclude", cls.exclude_patterns),
-            embedding_model=data.get("embedding_model", cls.embedding_model),
-            token_limit=data.get("token_limit", cls.token_limit),
-            auto_expand_links=data.get("auto_expand_links", cls.auto_expand_links),
-            chunk_size=data.get("chunk_size", cls.chunk_size),
-            chunk_overlap=data.get("chunk_overlap", cls.chunk_overlap),
+            exclude_patterns=data.get("exclude", default_excludes),
+            embedding_model=data.get("embedding_model", "bge-small-zh"),
+            token_limit=data.get("token_limit", 4000),
+            auto_expand_links=data.get("auto_expand_links", True),
+            chunk_size=data.get("chunk_size", 500),
+            chunk_overlap=data.get("chunk_overlap", 50),
         )
 
     def to_file(self, path: Path) -> None:

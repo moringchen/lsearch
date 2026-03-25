@@ -12,13 +12,13 @@ paths:
 
 # 排除的文件/目录
 exclude:
-  - node_modules/**
-  - .git/**
-  - __pycache__/**
-  - *.pyc
-  - .venv/**
-  - dist/**
-  - build/**
+  - "node_modules/**"
+  - ".git/**"
+  - "__pycache__/**"
+  - "*.pyc"
+  - ".venv/**"
+  - "dist/**"
+  - "build/**"
 
 # 嵌入模型选择
 # - all-MiniLM-L6-v2: 英文，70MB，速度快
