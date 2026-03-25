@@ -1,7 +1,7 @@
 {
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"cd /tmp && mkdir -p test-project && cd test-project && lsearch init\",\"description\":\"Test auto-generated name\"}",
-  "error": "Exit code 1\n/opt/miniconda3/lib/python3.10/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.0.1)/charset_normalizer (3.3.2) doesn't match a supported version!\n  warnings.warn(\nDisabling PyTorch because PyTorch >= 2.4 is required but found 2.2.2\nPyTorch was not found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.\n\nA module that was compiled using NumPy 1.x cannot be run in\nNumPy 2.0.1 as it may cra...",
-  "timestamp": "2026-03-25T08:47:32.644Z",
+  "tool_name": "WebFetch",
+  "tool_input_preview": "{\"url\":\"https://skills.sh\",\"prompt\":\"Find information about how to submit or add a skill to this marketplace. Look for submission forms, GitHub repositories, documentation, or contact methods for addi...",
+  "error": "Unable to verify if domain skills.sh is safe to fetch. This may be due to network restrictions or enterprise security policies blocking claude.ai.",
+  "timestamp": "2026-03-25T09:30:20.377Z",
   "retry_count": 1
 }

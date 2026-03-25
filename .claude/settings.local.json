@@ -37,7 +37,8 @@
       "Skill(update-config)",
       "Bash(pip install:*)",
       "Bash(lsearch init:*)",
-      "Bash(cp -r .claude/skills/lsearch ~/.claude/skills/)"
+      "Bash(cp -r .claude/skills/lsearch ~/.claude/skills/)",
+      "WebFetch(domain:skills.sh)"
     ]
   }
 }

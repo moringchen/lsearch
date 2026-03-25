@@ -106,35 +106,51 @@ MIT License
 
 ---
 
-## How to Submit
+## How to Get Listed on skills.sh
 
-> ⚠️ **Note:** skills.sh currently does not have a public submission form. Here are alternative approaches:
+> 📌 **Good News:** According to the [skills.sh FAQ](https://skills.sh/faq), skills appear on the leaderboard **automatically** through anonymous telemetry when users install them!
 
-### Option 1: Direct Installation (Recommended for Now)
-Users can install lsearch directly without it being indexed:
+### How It Works
+
+The skills leaderboard is powered by anonymous telemetry from the skills CLI. When users run:
 
 ```bash
 npx skills add moringchen/lsearch -g
 ```
 
-### Option 2: Contact Skills.sh Team
-Try reaching out through:
-- Claude Code Discord community
-- Anthropic support channels
-- GitHub Discussions in related repositories
+Your skill will be tracked and appear on skills.sh based on installation count. **No manual submission required!**
 
-### Option 3: Create Issue in Community Registry
-Some community members maintain unofficial registries. Search for:
-- `skills-registry` on GitHub
-- `claude-code-skills` topics
+### What You Need to Do
 
-### Option 4: Self-Hosted Marketplace
-Use the `example-marketplace/` in this repo to create your own marketplace for your team.
+1. **Make sure your repository is public** ✅ (Already done)
+2. **Ensure marketplace.json is valid** ✅ (Already done)
+3. **Share your skill with users** - The more people install it, the higher it ranks
+
+### Sharing Your Skill
+
+Share this installation command with your users:
+
+```bash
+npx skills add moringchen/lsearch -g
+```
+
+Or share the PyPI package:
+
+```bash
+pip install lsearch
+```
+
+### Tracking Your Progress
+
+Once users start installing your skill:
+- It will appear on https://skills.sh leaderboard
+- Ranking is based on installation count
+- No personal data is collected - only aggregate counts
+
+### Self-Hosted Marketplace (Optional)
+
+For team/private distribution, use the `example-marketplace/` in this repo.
 
 ---
 
-**Submission Date:** _YYYY-MM-DD_
-
-**Submitter:** _Your Name/Handle_
-
-**Status:** ⏳ Waiting for skills.sh to open public submissions
+**Status:** 🚀 Ready - Just need users to install!

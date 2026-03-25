@@ -68,20 +68,32 @@
   "hotPaths": [
     {
       "path": "README.md",
-      "accessCount": 10,
-      "lastAccessed": 1774429078423,
+      "accessCount": 16,
+      "lastAccessed": 1774430228162,
       "type": "file"
     },
     {
       "path": "README.zh.md",
-      "accessCount": 9,
-      "lastAccessed": 1774429194323,
+      "accessCount": 15,
+      "lastAccessed": 1774430160841,
       "type": "file"
     },
     {
       "path": "CLAUDE.md",
       "accessCount": 8,
       "lastAccessed": 1774428281576,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/lsearch/SKILL.md",
+      "accessCount": 7,
+      "lastAccessed": 1774430138181,
+      "type": "file"
+    },
+    {
+      "path": "skills-submission/SUBMISSION.md",
+      "accessCount": 4,
+      "lastAccessed": 1774431338812,
       "type": "file"
     },
     {
@@ -97,15 +109,15 @@
       "type": "file"
     },
     {
-      "path": "docs/test.md",
-      "accessCount": 2,
-      "lastAccessed": 1774427164374,
+      "path": "example-marketplace/README.md",
+      "accessCount": 3,
+      "lastAccessed": 1774431362441,
       "type": "file"
     },
     {
-      "path": ".claude/skills/lsearch/SKILL.md",
+      "path": "docs/test.md",
       "accessCount": 2,
-      "lastAccessed": 1774427647871,
+      "lastAccessed": 1774427164374,
       "type": "file"
     },
     {
@@ -118,6 +130,18 @@
       "path": "pyproject.toml",
       "accessCount": 1,
       "lastAccessed": 1774427261867,
+      "type": "file"
+    },
+    {
+      "path": ".claude-plugin/marketplace.json",
+      "accessCount": 1,
+      "lastAccessed": 1774429356798,
+      "type": "file"
+    },
+    {
+      "path": "example-marketplace/.claude-plugin/marketplace.json",
+      "accessCount": 1,
+      "lastAccessed": 1774430680597,
       "type": "file"
     }
   ],
