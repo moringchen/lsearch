@@ -1,54 +1,12 @@
-# lsearch - Local Knowledge Base Search
+#!/bin/bash
+# lsearch: Search knowledge base
 
-Search your project's documentation using hybrid semantic + keyword search.
+if [ -z "$1" ]; then
+    echo "Usage: /lsearch <query>"
+    echo "Example: /lsearch authentication flow"
+    exit 1
+fi
 
-## Usage
-
-```
-/lsearch <query>
-/lsearch-index
-/lsearch-fetch <url>
-/lsearch-add <path>
-/lsearch-stats
-```
-
-## Description
-
-lsearch provides local RAG (Retrieval-Augmented Generation) capabilities for Claude Code:
-
-- **Hybrid Search**: Combines vector similarity (Chroma) + BM25 keyword matching
-- **Link Graph**: Obsidian-style bidirectional link support
-- **Web Fetching**: Index API docs and Swagger specs
-- **Local Models**: Uses small embedding models (70-300MB)
-
-## Examples
-
-```bash
-# Search knowledge base
-/lsearch authentication flow
-
-# Index current project
-/lsearch-index
-
-# Fetch web documentation
-/lsearch-fetch https://docs.example.com/api
-
-# Add temporary path for this session
-/lsearch-add /path/to/notes
-
-# View statistics
-/lsearch-stats
-```
-
-## Configuration
-
-Configuration is stored in `.lsearch/config.yaml`:
-
-```yaml
-name: my-project
-paths:
-  - ./docs
-  - ./README.md
-embedding_model: all-MiniLM-L6-v2
-token_limit: 4000
-```
+cd "${PWD}"
+echo "Searching knowledge base for: $*"
+python -m lsearch.cli search "$@" 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"

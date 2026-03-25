@@ -1,23 +1,5 @@
-# lsearch-stats - Knowledge Base Statistics
+#!/bin/bash
+# lsearch-stats: Show knowledge base statistics
 
-Display statistics about the knowledge base.
-
-## Usage
-
-```
-/lsearch-stats
-```
-
-## Output
-
-Shows:
-- Vector index (Chroma) document count
-- BM25 keyword index document count
-- Link graph statistics (notes and links)
-- Configuration summary
-
-## Examples
-
-```bash
-/lsearch-stats
-```
+cd "${PWD}"
+lsearch status 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"

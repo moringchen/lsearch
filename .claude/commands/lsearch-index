@@ -1,26 +1,5 @@
-# lsearch-index - Index Knowledge Base
+#!/bin/bash
+# lsearch-index: Index knowledge base
 
-Manually trigger indexing of configured knowledge base paths.
-
-## Usage
-
-```
-/lsearch-index [path]
-```
-
-## Arguments
-
-- `path` (optional): Specific path to index. If not provided, indexes all configured paths.
-
-## Examples
-
-```bash
-# Index all configured paths
-/lsearch-index
-
-# Index specific directory
-/lsearch-index ./docs
-
-# Index specific file
-/lsearch-index ./README.md
-```
+cd "${PWD}"
+lsearch index "$@" 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"
