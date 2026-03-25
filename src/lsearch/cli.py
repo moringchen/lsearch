@@ -26,16 +26,34 @@ def server():
     server_main()
 
 
+def generate_kb_name(cwd: Path) -> str:
+    """Generate knowledge base name from current directory path.
+
+    Uses current dir name by default. If index exists, go up one level
+    and combine with hyphen.
+    """
+    name = cwd.name
+    index_dir = Config.get_index_dir(name)
+
+    # If index exists, try to include parent directory
+    if index_dir.exists():
+        parent = cwd.parent
+        if parent.name and parent != cwd:
+            name = f"{parent.name}-{name}"
+
+    return name
+
+
 @main.command()
 @click.option(
     "--name",
-    default="default",
-    help="Knowledge base name",
+    default=None,
+    help="Knowledge base name (default: auto-generated from directory)",
 )
 @click.option(
     "--path",
     multiple=True,
-    help="Paths to include in the knowledge base",
+    help="Paths to include in the knowledge base (default: ./docs)",
 )
 @click.option(
     "--model",
@@ -43,11 +61,19 @@ def server():
     type=click.Choice(["all-MiniLM-L6-v2", "bge-small-zh", "bge-small-en"]),
     help="Embedding model to use",
 )
-def init(name: str, path: tuple, model: str):
+def init(name: str | None, path: tuple, model: str):
     """Initialize a new knowledge base configuration."""
+    # Auto-generate name from current directory if not provided
+    if name is None:
+        cwd = Path.cwd()
+        name = generate_kb_name(cwd)
+
+    # Use default path if not provided
+    paths = list(path) if path else ["./docs"]
+
     config = Config(
         name=name,
-        paths=[{"path": p, "session_only": False} for p in path] if path else [],
+        paths=[{"path": p, "session_only": False} for p in paths],
         embedding_model=model,
     )
 
@@ -60,10 +86,11 @@ def init(name: str, path: tuple, model: str):
 
     console.print(f"[green]Created knowledge base: {name}[/green]")
     console.print(f"Configuration saved to: {config_file}")
-
-    if not path:
-        console.print("\n[yellow]Note: No paths specified. Add paths to config.yaml or use:[/yellow]")
-        console.print("  lsearch add-path <path>")
+    console.print(f"\nPaths configured: {', '.join(paths)}")
+    console.print("\nNext steps:")
+    console.print("  1. Create your docs directory: mkdir -p ./docs")
+    console.print("  2. Add markdown files to ./docs")
+    console.print("  3. In Claude Code, run: /lsearch-index")
 
 
 @main.command()

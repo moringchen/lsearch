@@ -67,8 +67,16 @@ pip install -e ".[dev]"
 
 ```bash
 # 在你的项目目录中
+# 自动根据目录生成名称，默认使用 ./docs 路径
+lsearch init
+
+# 或自定义名称和路径
 lsearch init --name my-project --path ./docs --path ./README.md
 ```
+
+**自动生成的名称：**
+- 如果在 `/home/user/projects/my-app` 中运行，名称将为：`my-app`
+- 如果 `my-app` 已存在，名称将为：`projects-my-app`
 
 这会创建 `.lsearch/config.yaml`：
 

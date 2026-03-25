@@ -67,8 +67,16 @@ pip install -e ".[dev]"
 
 ```bash
 # In your project directory
+# Auto-generates name from directory, uses ./docs as default path
+lsearch init
+
+# Or customize name and paths
 lsearch init --name my-project --path ./docs --path ./README.md
 ```
+
+**Auto-generated names:**
+- If run in `/home/user/projects/my-app`, name becomes: `my-app`
+- If `my-app` already exists, name becomes: `projects-my-app`
 
 This creates `.lsearch/config.yaml`:
 

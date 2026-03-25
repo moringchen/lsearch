@@ -53,6 +53,10 @@ cd ~/.claude/plugins/lsearch && python install.py
 
 1. **Initialize knowledge base** in your project:
    ```bash
+   # Auto-generates name from directory, uses ./docs as default
+   lsearch init
+
+   # Or specify name and paths
    lsearch init --name my-project --path ./docs
    ```
 
@@ -169,6 +173,10 @@ cd ~/.claude/plugins/lsearch && python install.py
 
 1. **在项目目录初始化知识库：**
    ```bash
+   # 自动根据目录生成名称，默认使用 ./docs
+   lsearch init
+
+   # 或指定名称和路径
    lsearch init --name my-project --path ./docs
    ```
 
