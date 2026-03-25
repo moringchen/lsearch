@@ -57,8 +57,8 @@ def generate_kb_name(cwd: Path) -> str:
 )
 @click.option(
     "--model",
-    default="all-MiniLM-L6-v2",
-    type=click.Choice(["all-MiniLM-L6-v2", "bge-small-zh", "bge-small-en"]),
+    default="bge-small-zh",
+    type=click.Choice(["bge-small-zh", "all-MiniLM-L6-v2", "bge-small-en"]),
     help="Embedding model to use",
 )
 def init(name: str | None, path: tuple, model: str):

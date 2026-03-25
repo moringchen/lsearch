@@ -29,7 +29,7 @@ class Config:
         "dist/**",
         "build/**",
     ])
-    embedding_model: str = "all-MiniLM-L6-v2"
+    embedding_model: str = "bge-small-zh"
     token_limit: int = 4000
     auto_expand_links: bool = True
     chunk_size: int = 500
