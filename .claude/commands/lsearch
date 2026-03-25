@@ -1,12 +1,29 @@
-#!/bin/bash
-# lsearch: Search knowledge base
+---
+description: Search knowledge base with hybrid semantic + keyword search
+---
 
-if [ -z "$1" ]; then
-    echo "Usage: /lsearch <query>"
-    echo "Example: /lsearch authentication flow"
-    exit 1
-fi
+# Search Knowledge Base
 
-cd "${PWD}"
-echo "Searching knowledge base for: $*"
-python -m lsearch.cli search "$@" 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"
+Search your project's documentation using hybrid semantic + keyword search.
+
+## Usage
+
+```
+/lsearch <query>
+```
+
+## Arguments
+
+- `query` (required): Search query
+
+## Examples
+
+```
+/lsearch authentication flow
+/lsearch deployment process
+/lsearch API documentation
+```
+
+## Your task
+
+Use lsearch to search the knowledge base with the provided query and return relevant results.

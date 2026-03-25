@@ -1,11 +1,22 @@
-#!/bin/bash
-# lsearch-fetch: Fetch URL to knowledge base
+---
+description: Fetch URL and add to knowledge base
+---
 
-if [ -z "$1" ]; then
-    echo "Usage: /lsearch-fetch <url>"
-    echo "Example: /lsearch-fetch https://docs.example.com"
-    exit 1
-fi
+# Fetch URL to Knowledge Base
 
-cd "${PWD}"
-python -m lsearch.fetcher "$1" 2>/dev/null || echo "Error: Failed to fetch URL"
+Download a web page and add it to the knowledge base.
+
+## Usage
+
+```
+/lsearch-fetch <url> [title]
+```
+
+## Arguments
+
+- `url` (required): URL to fetch
+- `title` (optional): Custom title for the document
+
+## Your task
+
+Fetch the provided URL and add it to the knowledge base.

@@ -1,5 +1,23 @@
-#!/bin/bash
-# lsearch-stats: Show knowledge base statistics
+---
+description: Show knowledge base statistics
+---
 
-cd "${PWD}"
-lsearch status 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"
+# Knowledge Base Statistics
+
+Display statistics about the knowledge base.
+
+## Usage
+
+```
+/lsearch-stats
+```
+
+## Your task
+
+Run lsearch status to show current knowledge base statistics including:
+- Knowledge base name
+- Embedding model
+- Token limit
+- Auto expand links setting
+- Configured paths
+- Index status

@@ -1,11 +1,25 @@
-#!/bin/bash
-# lsearch-add: Add temporary path to knowledge base
+---
+description: Add temporary path to knowledge base
+---
 
-if [ -z "$1" ]; then
-    echo "Usage: /lsearch-add <path>"
-    echo "Example: /lsearch-add ./docs"
-    exit 1
-fi
+# Add Path to Knowledge Base
 
-cd "${PWD}"
-lsearch add-path "$1" 2>/dev/null || echo "Error: lsearch not installed. Run: pip install lsearch"
+Add a temporary path to the current session's knowledge base.
+
+## Usage
+
+```
+/lsearch-add <path>
+```
+
+## Arguments
+
+- `path` (required): Path to add (file or directory)
+
+## Description
+
+Adds a path that is only valid for the current Claude Code session. The path will not persist after the session ends.
+
+## Your task
+
+Add the provided path to the knowledge base using lsearch add-path.
