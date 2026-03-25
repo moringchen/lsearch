@@ -21,7 +21,23 @@
       "Bash(mkdir -p .claude/skills/lsearch)",
       "Bash(mv skill/SKILL.md .claude/skills/lsearch/)",
       "Bash(chmod +x install.py)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(python:*)",
+      "Bash(while pgrep:*)",
+      "Bash(do sleep:*)",
+      "Bash(done)",
+      "Bash(pip show:*)",
+      "Bash(cd:*)",
+      "Bash(pip uninstall:*)",
+      "Bash(ls ~/.claude/commands/lsearch*)",
+      "Bash(npx skills:*)",
+      "Bash(cp:*)",
+      "Bash(cp .claude/commands/* ~/.claude/commands/)",
+      "Read(//Users/moringchen/.claude/commands/**)",
+      "Skill(update-config)",
+      "Bash(pip install:*)",
+      "Bash(lsearch init:*)",
+      "Bash(cp -r .claude/skills/lsearch ~/.claude/skills/)"
     ]
   }
 }

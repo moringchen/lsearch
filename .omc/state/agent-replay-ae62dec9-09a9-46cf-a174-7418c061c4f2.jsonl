@@ -22,3 +22,8 @@
 {"t":0,"agent":"af4abed","agent_type":"unknown","event":"agent_stop","success":true}
 {"t":0,"agent":"aef5b68","agent_type":"unknown","event":"agent_stop","success":true}
 {"t":0,"agent":"ae752fc","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"a5454ff","agent_type":"general-purpose","event":"agent_start","parent_mode":"none"}
+{"t":0,"agent":"a5454ff","agent_type":"general-purpose","event":"agent_stop","success":true,"duration_ms":845315}
+{"t":0,"agent":"a6e5d8c","agent_type":"unknown","event":"agent_stop","success":true}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"find-skills"}
+{"t":0,"agent":"system","event":"skill_invoked","skill_name":"update-config"}

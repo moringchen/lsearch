@@ -1,0 +1,125 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1774424975563,
+  "projectRoot": "/Users/moringchen/workspace/ai/skills/locrag",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src",
+      "tests"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 0,
+      "lastAccessed": 1774424975390,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 2,
+      "lastAccessed": 1774424975390,
+      "keyFiles": [
+        "__init__.py",
+        "test_config.py"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "README.md",
+      "accessCount": 10,
+      "lastAccessed": 1774429078423,
+      "type": "file"
+    },
+    {
+      "path": "README.zh.md",
+      "accessCount": 9,
+      "lastAccessed": 1774429194323,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 8,
+      "lastAccessed": 1774428281576,
+      "type": "file"
+    },
+    {
+      "path": "src/lsearch/config.py",
+      "accessCount": 3,
+      "lastAccessed": 1774428654763,
+      "type": "file"
+    },
+    {
+      "path": "src/lsearch/cli.py",
+      "accessCount": 3,
+      "lastAccessed": 1774428669349,
+      "type": "file"
+    },
+    {
+      "path": "docs/test.md",
+      "accessCount": 2,
+      "lastAccessed": 1774427164374,
+      "type": "file"
+    },
+    {
+      "path": ".claude/skills/lsearch/SKILL.md",
+      "accessCount": 2,
+      "lastAccessed": 1774427647871,
+      "type": "file"
+    },
+    {
+      "path": ".lsearch/config.yaml",
+      "accessCount": 1,
+      "lastAccessed": 1774427020987,
+      "type": "file"
+    },
+    {
+      "path": "pyproject.toml",
+      "accessCount": 1,
+      "lastAccessed": 1774427261867,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

@@ -146,7 +146,7 @@ exclude:                                  # 排除模式
   - node_modules/**
   - .git/**
   - "*.tmp"
-embedding_model: all-MiniLM-L6-v2         # 嵌入模型
+embedding_model: bge-small-zh             # 嵌入模型（默认：中文优化）
 token_limit: 4000                         # 每次查询最大 Token 数
 auto_expand_links: true                   # 包含链接的笔记
 chunk_size: 500                           # 每块字数
@@ -155,11 +155,11 @@ chunk_overlap: 50                         # 块之间重叠字数
 
 ### 嵌入模型
 
-| 模型 | 大小 | 适用场景 | 语言 |
-|------|------|----------|------|
-| `all-MiniLM-L6-v2` | 70MB | 通用场景 | 英文 |
-| `bge-small-zh` | 300MB | 中文优化 | 中文 |
-| `bge-small-en` | 130MB | 英文优化 | 英文 |
+| 模型 | 大小 | 适用场景 | 语言 | 默认 |
+|------|------|----------|------|------|
+| `bge-small-zh` | 300MB | 中文优化 | 中文 | ✅ 默认 |
+| `all-MiniLM-L6-v2` | 70MB | 通用场景 | 英文 | |
+| `bge-small-en` | 130MB | 英文优化 | 英文 | |
 
 ## CLI 命令
 
@@ -178,6 +178,82 @@ lsearch models
 
 # 运行 MCP 服务器（用于 Claude Code 集成）
 lsearch server
+```
+
+## 使用示例
+
+### 示例 1：项目文档设置
+
+```bash
+# 进入你的项目目录
+cd ~/projects/my-web-app
+
+# 使用默认设置初始化（自动生成名称，./docs 路径）
+lsearch init
+
+# 创建 docs 目录并添加文件
+mkdir -p docs
+echo "# API 文档" > docs/api.md
+echo "# 部署指南" > docs/deployment.md
+
+# 在 Claude Code 中索引文档
+/lsearch-index
+
+# 搜索你的文档
+lsearch: 如何部署这个项目？
+```
+
+### 示例 2：多语言项目
+
+```bash
+# 使用中文优化模型初始化（默认）
+lsearch init --name backend-api
+
+# 添加多个文档路径
+lsearch init --name fullstack \
+  --path ./backend/docs \
+  --path ./frontend/docs \
+  --path ./README.md \
+  --model bge-small-zh
+```
+
+### 示例 3：网页文档
+
+```bash
+# 抓取并索引外部 API 文档
+/lsearch-fetch https://docs.example.com/api
+
+# 搜索抓取的文档
+@kb example API 认证
+```
+
+### 示例 4：临时知识库
+
+```bash
+# 只为当前会话添加临时路径
+/lsearch-add ~/personal-notes/project-ideas.md
+
+# 搜索包括项目文档和临时笔记
+lsearch: 项目需求是什么？
+```
+
+### 示例 5：多项目知识库
+
+```yaml
+# .lsearch/config.yaml
+name: work-projects
+paths:
+  - path: ~/work/project-a/docs
+    session_only: false
+  - path: ~/work/project-b/docs
+    session_only: false
+  - path: ~/work/shared-guides
+    session_only: false
+exclude:
+  - "**/node_modules/**"
+  - "**/.git/**"
+embedding_model: bge-small-zh
+token_limit: 4000
 ```
 
 ## 网页抓取

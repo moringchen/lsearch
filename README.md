@@ -146,7 +146,7 @@ exclude:                                  # Patterns to exclude
   - node_modules/**
   - .git/**
   - "*.tmp"
-embedding_model: all-MiniLM-L6-v2         # Embedding model
+embedding_model: bge-small-zh             # Embedding model (default: Chinese-optimized)
 token_limit: 4000                         # Max tokens per query
 auto_expand_links: true                   # Include linked notes
 chunk_size: 500                           # Words per chunk
@@ -155,11 +155,11 @@ chunk_overlap: 50                         # Overlap between chunks
 
 ### Embedding Models
 
-| Model | Size | Best For | Language |
-|-------|------|----------|----------|
-| `all-MiniLM-L6-v2` | 70MB | General purpose | English |
-| `bge-small-zh` | 300MB | Optimized for Chinese | Chinese |
-| `bge-small-en` | 130MB | Optimized for English | English |
+| Model | Size | Best For | Language | Default |
+|-------|------|----------|----------|---------|
+| `bge-small-zh` | 300MB | Optimized for Chinese | Chinese | ✅ Default |
+| `all-MiniLM-L6-v2` | 70MB | General purpose | English | |
+| `bge-small-en` | 130MB | Optimized for English | English | |
 
 ## CLI Commands
 
@@ -178,6 +178,82 @@ lsearch models
 
 # Run MCP server (for Claude Code integration)
 lsearch server
+```
+
+## Usage Examples
+
+### Example 1: Project Documentation Setup
+
+```bash
+# Navigate to your project
+cd ~/projects/my-web-app
+
+# Initialize with default settings (auto-generated name, ./docs path)
+lsearch init
+
+# Create docs directory and add files
+mkdir -p docs
+echo "# API Documentation" > docs/api.md
+echo "# Deployment Guide" > docs/deployment.md
+
+# In Claude Code, index the documents
+/lsearch-index
+
+# Search your documentation
+lsearch: How do I deploy this project?
+```
+
+### Example 2: Multi-language Project
+
+```bash
+# Initialize with Chinese-optimized model (default)
+lsearch init --name backend-api
+
+# Add multiple documentation paths
+lsearch init --name fullstack \
+  --path ./backend/docs \
+  --path ./frontend/docs \
+  --path ./README.md \
+  --model bge-small-zh
+```
+
+### Example 3: Web Documentation
+
+```bash
+# Fetch and index external API docs
+/lsearch-fetch https://docs.example.com/api
+
+# Search the fetched documentation
+@kb example API authentication
+```
+
+### Example 4: Temporary Knowledge Base
+
+```bash
+# Add a temporary path for this session only
+/lsearch-add ~/personal-notes/project-ideas.md
+
+# Search includes both project docs and temporary notes
+lsearch: What are the project requirements?
+```
+
+### Example 5: Multi-Project Knowledge
+
+```yaml
+# .lsearch/config.yaml
+name: work-projects
+paths:
+  - path: ~/work/project-a/docs
+    session_only: false
+  - path: ~/work/project-b/docs
+    session_only: false
+  - path: ~/work/shared-guides
+    session_only: false
+exclude:
+  - "**/node_modules/**"
+  - "**/.git/**"
+embedding_model: bge-small-zh
+token_limit: 4000
 ```
 
 ## Web Fetching
