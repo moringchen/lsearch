@@ -28,11 +28,11 @@ Install as a Claude Code plugin with automatic MCP configuration:
 # Clone to Claude plugins directory
 git clone https://github.com/moringchen/lsearch.git ~/.claude/plugins/lsearch
 
-# Run install script
+# Run install script (IMPORTANT: Required for slash commands to work)
 cd ~/.claude/plugins/lsearch && python install.py
 ```
 
-Then restart Claude Code.
+**⚠️ You must restart Claude Code after installation for slash commands (`/lsearch`, `/lsearch-index`, etc.) to appear.**
 
 ### Option 2: PyPI
 
