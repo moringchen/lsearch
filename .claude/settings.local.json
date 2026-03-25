@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(gh repo:*)",
+      "Bash(curl -sL https://raw.githubusercontent.com/ItMeDiaTech/rag-cli/main/README.md)",
+      "Bash(curl -sL https://raw.githubusercontent.com/ItMeDiaTech/rag-cli/master/README.md)",
+      "WebSearch",
+      "Bash(find . -maxdepth 2 -type f \\\\\\(-name *.md -o -name README* -o -name CLAUDE* \\\\\\))",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
