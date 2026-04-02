@@ -1,29 +1,68 @@
 ---
 name: lsearch-init
-description: Initialize lsearch knowledge base with interactive guided setup (keyboard navigation). Must be run before using other lsearch commands.
+description: Initialize lsearch knowledge base with interactive TUI (keyboard navigation). Run in your local terminal.
 ---
 
-Run the interactive initialization wizard in your terminal:
+I'll help you initialize lsearch for this project. Please run the following command in your **local terminal** (not in Claude Code):
 
 ```bash
 lsearch init
 ```
 
-This will launch an interactive TUI where you can use ↑↓ arrow keys to navigate, Space to select, and Enter to confirm.
+This will launch an interactive TUI where you can use keyboard navigation:
 
-**What you'll configure:**
-1. **Knowledge Base Name** - Auto-suggested from directory name
-2. **Documentation Paths** - Select from common paths or enter custom
-3. **Embedding Model** - Choose from 3 models (arrow keys + Enter)
-4. **Confirmation** - Review and confirm your settings
+| Key | Action |
+|-----|--------|
+| ↑ ↓ | Navigate up/down |
+| Space | Select/deselect (checkbox) |
+| Enter | Confirm selection |
+| Ctrl+C | Cancel |
 
-**Alternative: Non-interactive mode**
-If you prefer command-line arguments:
+## What you'll configure
+
+**Step 1: Knowledge Base Name**
+- Auto-suggested based on directory name
+- Edit or accept with Enter
+
+**Step 2: Documentation Paths**  
+- Select from common paths:
+  - `./docs` - Documentation folder
+  - `./README.md` - Main readme
+  - `./src` - Source code
+  - `./notes` - Notes folder
+- Use Space to toggle selection
+
+**Step 3: Embedding Model**
+- 🌏 `bge-small-zh` - Chinese optimized (~300MB)
+- 🇬🇧 `all-MiniLM-L6-v2` - English, small & fast (~70MB)  
+- 🇬🇧 `bge-small-en` - English optimized (~130MB)
+
+**Step 4: Confirm & Create**
+- Review your settings
+- Confirm to create `.lsearch/config.yaml`
+
+---
+
+## Alternative: Quick init with defaults
+
+If you want to use defaults without TUI:
+
 ```bash
-lsearch init --no-interactive --name my-project --path ./docs --model bge-small-zh
+lsearch init --no-interactive --name <name> --path <paths> --model <model>
 ```
 
-**After initialization:**
-- Configuration saved to `.lsearch/config.yaml`
-- Run `/lsearch-index` to index your documents
-- Run `/lsearch <query>` to search
+Example:
+```bash
+lsearch init --no-interactive --name my-docs --path ./docs --model bge-small-zh
+```
+
+---
+
+## After initialization
+
+Once configured, you can use these commands in Claude Code:
+- `/lsearch-index` - Index your documents
+- `/lsearch <query>` - Search knowledge base
+- `/lsearch-stats` - View statistics
+
+Please run `lsearch init` in your terminal and let me know when you're done!
