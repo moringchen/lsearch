@@ -250,20 +250,17 @@ def create_new_config(cwd: Path, default_name: str):
     if not name:
         name = default_name
 
-    # Step 2: Documentation Paths - use dictionary to separate display from value
-    path_choices = {
-        "./docs": "./docs (Documentation folder)",
-        "./README.md": "./README.md (Main readme)",
-        "./src": "./src (Source code)",
-        "custom": "Other paths (custom)",
-    }
+    # Step 2: Documentation Paths
+    path_options = [
+        "./docs",
+        "./README.md",
+        "./src",
+        "Other (custom)",
+    ]
 
     selected = questionary.checkbox(
         "Select paths to index (Space=select, Enter=confirm):",
-        choices=[
-            questionary.Choice(display, value=key)
-            for key, display in path_choices.items()
-        ],
+        choices=path_options,
         default=["./docs"]
     ).ask()
 
@@ -272,8 +269,8 @@ def create_new_config(cwd: Path, default_name: str):
 
     # Parse selected paths
     paths = []
-    for key in selected:
-        if key == "custom":
+    for p in selected:
+        if p == "Other (custom)":
             custom = questionary.text(
                 "Enter paths (comma-separated):",
                 default="./docs,./README.md"
@@ -281,7 +278,7 @@ def create_new_config(cwd: Path, default_name: str):
             if custom:
                 paths.extend([p.strip() for p in custom.split(",")])
         else:
-            paths.append(key)
+            paths.append(p)
 
     # Remove duplicates while preserving order
     seen = set()
