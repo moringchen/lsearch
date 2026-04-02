@@ -34,13 +34,28 @@ cd ~/.claude/plugins/lsearch && python install.py
 
 **⚠️ You must restart Claude Code after installation for slash commands (`/lsearch`, `/lsearch-index`, etc.) to appear.**
 
-### Option 2: PyPI
+### Option 2: npx (推荐)
+
+使用 npx 快速安装，自动配置 Claude Code：
+
+```bash
+npx @moringchen/lsearch
+```
+
+或者全局安装：
+
+```bash
+npm install -g @moringchen/lsearch
+lsearch-install
+```
+
+### Option 3: PyPI
 
 ```bash
 pip install lsearch
 ```
 
-Then manually add to `~/.claude/settings.json`:
+然后手动添加到 `~/.claude/settings.json`：
 
 ```json
 {
@@ -52,20 +67,6 @@ Then manually add to `~/.claude/settings.json`:
   }
 }
 ```
-
-### Option 3: Skills CLI (npx skills)
-
-Install via the Skills CLI from [skills.sh](https://skills.sh):
-
-```bash
-# Install lsearch skill
-npx skills add moringchen/lsearch -g
-
-# Or install from PyPI via skills
-npx skills add moringchen/lsearch@pip -g
-```
-
-The `-g` flag installs globally (user-level).
 
 ### Option 4: Development Install
 

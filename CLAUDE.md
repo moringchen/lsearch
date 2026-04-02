@@ -1,233 +1,179 @@
-# lsearch - Claude Code Plugin
+# CLAUDE.md
 
-Local RAG knowledge base for Claude Code with hybrid semantic + keyword search.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**English** | [中文](#中文说明)
+## Project Overview
 
----
+lsearch is a Local RAG (Retrieval-Augmented Generation) knowledge base plugin for Claude Code. It provides hybrid semantic + keyword search over markdown documentation using three parallel indexers: ChromaDB (vector), Whoosh/BM25 (keyword), and NetworkX (link graph).
 
-## Installation
+## Development Commands
 
-### Method 1: Auto-install (Recommended)
-
+### Setup
 ```bash
-# Clone to Claude plugins directory
-git clone https://github.com/moringchen/lsearch.git ~/.claude/plugins/lsearch
-
-# Run install script
-cd ~/.claude/plugins/lsearch && python install.py
+# Install in editable mode with dev dependencies
+pip install -e ".[dev]"
 ```
 
-### Method 2: Manual Install
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/moringchen/lsearch.git
-   cd lsearch
-   ```
-
-2. **Install Python package:**
-   ```bash
-   pip install -e .
-   ```
-
-3. **Configure MCP Server** in `~/.claude/settings.json`:
-   ```json
-   {
-     "mcpServers": {
-       "lsearch": {
-         "command": "python",
-         "args": ["-m", "lsearch.server"]
-       }
-     }
-   }
-   ```
-
-4. **Copy skill and commands** (optional):
-   ```bash
-   cp -r .claude/skills/lsearch ~/.claude/skills/
-   cp -r .claude/commands/* ~/.claude/commands/
-   ```
-
-## Quick Start
-
-1. **Initialize knowledge base** in your project:
-   ```bash
-   # Auto-generates name from directory, uses ./docs as default
-   lsearch init
-
-   # Or specify name and paths
-   lsearch init --name my-project --path ./docs
-   ```
-
-2. **Start using in Claude Code:**
-   - `lsearch: How does authentication work?`
-   - `@kb deployment process`
-   - `/lsearch-index`
-
-## Available Commands
-
-| Command | Description |
-|---------|-------------|
-| `lsearch: <query>` | Search knowledge base (auto-trigger) |
-| `@kb <query>` | Force knowledge base search |
-| `/lsearch <query>` | Search via command |
-| `/lsearch-index` | Index configured paths |
-| `/lsearch-fetch <url>` | Fetch and index web page |
-| `/lsearch-add <path>` | Add temporary session path |
-| `/lsearch-stats` | Show knowledge base stats |
-
-## Configuration
-
-Create `.lsearch/config.yaml` in your project:
-
-```yaml
-name: my-project
-paths:
-  - ./docs
-  - ./README.md
-  - ./src
-exclude:
-  - node_modules/**
-  - .git/**
-embedding_model: all-MiniLM-L6-v2  # or bge-small-zh for Chinese
-token_limit: 4000
-auto_expand_links: true
-```
-
-## How It Works
-
-```
-Markdown Files → Chunks → Vector Index (Chroma) + BM25 Index + Link Graph
-                                              ↓
-                                    Hybrid Search (RRF Fusion)
-                                              ↓
-                                     Context Builder → Claude
-```
-
-## Features
-
-- 🔍 **Hybrid Search**: Semantic (vector) + BM25 keyword + RRF fusion
-- 🔗 **Link Graph**: Obsidian-style bidirectional links
-- 🌐 **Web Fetching**: Index API docs, Swagger specs
-- 🤖 **Local Models**: 70-300MB embedding models
-- 💾 **Pure Local**: No cloud dependencies
-
-## Requirements
-
-- Python 3.10+
-- Claude Code with MCP support
-
-## License
-
-MIT
-
----
-
-## 中文说明
-
-### 安装方法
-
-#### 方法 1：自动安装（推荐）
-
+### Testing
 ```bash
-# 克隆到 Claude 插件目录
-git clone https://github.com/moringchen/lsearch.git ~/.claude/plugins/lsearch
+# Run all tests
+pytest
 
-# 运行安装脚本
-cd ~/.claude/plugins/lsearch && python install.py
+# Run with coverage
+pytest --cov=lsearch --cov-report=xml
+
+# Run specific test file
+pytest tests/test_config.py
+
+# Run specific test
+pytest tests/test_config.py::test_config_save_load
 ```
 
-#### 方法 2：手动安装
+### Linting and Formatting
+```bash
+# Format code
+black src/ tests/
 
-1. **克隆仓库：**
-   ```bash
-   git clone https://github.com/moringchen/lsearch.git
-   cd lsearch
-   ```
+# Check formatting
+black --check src/ tests/
 
-2. **安装 Python 包：**
-   ```bash
-   pip install -e .
-   ```
+# Lint with ruff
+ruff check src/ tests/
 
-3. **配置 MCP 服务器**（在 `~/.claude/settings.json`）：
-   ```json
-   {
-     "mcpServers": {
-       "lsearch": {
-         "command": "python",
-         "args": ["-m", "lsearch.server"]
-       }
-     }
-   }
-   ```
-
-4. **复制 skill 和命令**（可选）：
-   ```bash
-   cp -r .claude/skills/lsearch ~/.claude/skills/
-   cp -r .claude/commands/* ~/.claude/commands/
-   ```
-
-### 快速开始
-
-1. **在项目目录初始化知识库：**
-   ```bash
-   # 自动根据目录生成名称，默认使用 ./docs
-   lsearch init
-
-   # 或指定名称和路径
-   lsearch init --name my-project --path ./docs
-   ```
-
-2. **在 Claude Code 中使用：**
-   - `lsearch: 认证如何工作？`
-   - `@kb 部署流程`
-   - `/lsearch-index`
-
-### 可用命令
-
-| 命令 | 说明 |
-|---------|-------------|
-| `lsearch: <query>` | 搜索知识库（自动触发） |
-| `@kb <query>` | 强制搜索知识库 |
-| `/lsearch <query>` | 通过命令搜索 |
-| `/lsearch-index` | 索引配置的路径 |
-| `/lsearch-fetch <url>` | 抓取并索引网页 |
-| `/lsearch-add <path>` | 添加临时会话路径 |
-| `/lsearch-stats` | 显示知识库统计信息 |
-
-### 配置
-
-在项目目录创建 `.lsearch/config.yaml`：
-
-```yaml
-name: my-project
-paths:
-  - ./docs
-  - ./README.md
-  - ./src
-exclude:
-  - node_modules/**
-  - .git/**
-embedding_model: all-MiniLM-L6-v2  # 或使用 bge-small-zh（中文）
-token_limit: 4000
-auto_expand_links: true
+# Type check
+mypy src/
 ```
 
-### 功能特性
+### Running the Server
+```bash
+# Run MCP server (for Claude Code integration)
+lsearch server
 
-- 🔍 **混合搜索**：语义（向量）+ BM25 关键词 + RRF 融合
-- 🔗 **链接图谱**：Obsidian 风格的双向链接
-- 🌐 **网页抓取**：索引 API 文档、Swagger 规范
-- 🤖 **本地模型**：70-300MB 嵌入模型
-- 💾 **纯本地**：无云端依赖
+# Or via module
+python -m lsearch.server
+```
 
-### 要求
+### CLI Commands
+```bash
+# Initialize knowledge base in current directory
+lsearch init
 
-- Python 3.10+
-- 支持 MCP 的 Claude Code
+# Check status
+lsearch status
 
-### 许可证
+# List available embedding models
+lsearch models
+```
 
-MIT
+## Architecture
+
+### Data Flow
+
+```
+Markdown Files → DocumentProcessor → Chunks
+                                          ↓
+                    ┌───────────────────────┼───────────────────────┐
+                    ↓                       ↓                       ↓
+              ChromaIndexer            BM25Indexer            LinkGraph
+              (vector/search)          (keyword/search)       (note relationships)
+                    └───────────────────────┬───────────────────────┘
+                                            ↓
+                              HybridSearcher (RRF Fusion)
+                                            ↓
+                              ContextBuilder (token management)
+                                            ↓
+                                        MCP Server
+```
+
+### Core Components
+
+**Entry Points:**
+- `src/lsearch/server.py` - MCP server (main entry for Claude Code)
+- `src/lsearch/cli.py` - CLI commands (`lsearch init`, `lsearch status`, etc.)
+- `src/lsearch/__main__.py` - Module entry point
+
+**Indexing Pipeline:**
+- `DocumentProcessor` - Parses markdown, extracts frontmatter/YAML, wiki-links (`[[Note]]`), splits into overlapping chunks
+- `ChromaIndexer` - Vector embeddings using sentence-transformers, cosine similarity search
+- `BM25Indexer` - Keyword search using Whoosh with stemming analyzer
+- `LinkGraph` - NetworkX graph for Obsidian-style bidirectional link navigation
+
+**Search Pipeline:**
+- `HybridSearcher` - Combines vector + BM25 results using Reciprocal Rank Fusion (RRF with k=60 constant)
+- `ContextBuilder` - Assembles results respecting token limits (default 4000)
+
+**Configuration:**
+- `Config` - Loads from `.lsearch/config.yaml`, stores indices in `~/.lsearch/indices/<name>/`
+
+### Key Design Patterns
+
+1. **RRF Fusion**: Combines rankings from vector and keyword search using `score = 1/(k + rank)` where k=60
+2. **Dual Storage**: Each document chunk is stored in both ChromaDB and Whoosh indices
+3. **Session Paths**: Temporary paths can be added per-session (not persisted to config)
+4. **Lazy Loading**: Config and indices are initialized on first tool call, not at import
+5. **Global + Project Config**: Indices stored in `~/.lsearch/`, config in project `.lsearch/config.yaml`
+
+### File Organization
+
+```
+src/lsearch/
+├── server.py              # MCP server with stdio transport
+├── cli.py                 # Click-based CLI
+├── config.py              # Config dataclass with YAML serialization
+├── document_processor.py  # Markdown parsing, chunking, frontmatter extraction
+├── embedding.py           # Embedding model management (sentence-transformers)
+├── fetcher.py             # URL fetching (HTML→Markdown, Swagger JSON)
+├── indexers/
+│   ├── chroma_indexer.py  # Vector index with ChromaDB
+│   ├── bm25_indexer.py    # Keyword index with Whoosh
+│   └── link_graph.py      # NetworkX graph for wiki-links
+└── search/
+    ├── hybrid_search.py   # RRF fusion searcher
+    └── context_builder.py # Token-aware context assembly
+```
+
+### Testing Structure
+
+Tests use `pytest` with fixtures in `tests/`:
+- `test_config.py` - Config serialization/deserialization
+- `test_document_processor.py` - Markdown parsing and chunking
+- `test_cli.py` - CLI command testing
+
+Tests use `tempfile.TemporaryDirectory` for isolation.
+
+### MCP Integration
+
+The server exposes 7 tools to Claude Code via MCP:
+- `search` - Basic hybrid search
+- `search_with_context` - Search with formatted LLM-ready context
+- `index` - Trigger indexing of configured paths
+- `fetch_url` - Download and index web pages
+- `add_path` - Add temporary session path
+- `list_paths` - Show configured paths
+- `get_stats` - Show index statistics
+
+Slash commands in `.claude/commands/` provide shortcuts:
+- `/lsearch <query>` → `search_with_context`
+- `/lsearch-index` → `index`
+- `/lsearch-fetch <url>` → `fetch_url`
+- `/lsearch-add <path>` → `add_path`
+- `/lsearch-stats` → `get_stats`
+
+### Embedding Models
+
+Three models supported (defined in `embedding.py`):
+- `bge-small-zh` (300MB, Chinese-optimized, default)
+- `all-MiniLM-L6-v2` (70MB, English general purpose)
+- `bge-small-en` (130MB, English-optimized)
+
+Models download automatically on first use via sentence-transformers.
+
+### Installation
+
+The `install.py` script:
+1. Installs package with `pip install -e .`
+2. Configures MCP server in `~/.claude/settings.json`
+3. Copies skill definition to `~/.claude/skills/`
+4. Copies slash commands to `~/.claude/commands/`
+
+Claude Code must be restarted after installation for slash commands to appear.

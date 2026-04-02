@@ -12,7 +12,7 @@ def test_default_config():
     """Test default configuration values."""
     config = Config()
     assert config.name == "default"
-    assert config.embedding_model == "all-MiniLM-L6-v2"
+    assert config.embedding_model == "bge-small-zh"
     assert config.token_limit == 4000
     assert config.auto_expand_links is True
 

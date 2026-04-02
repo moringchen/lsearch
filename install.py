@@ -76,10 +76,16 @@ def install_skills():
 
     if skill_src.exists():
         import shutil
-        if skill_dst.exists():
-            shutil.rmtree(skill_dst)
-        shutil.copytree(skill_src, skill_dst)
-        print(f"✅ Skill installed to {skill_dst}")
+        # Create skill directory
+        skill_dst.mkdir(exist_ok=True)
+        # Copy skill.yaml (required by Claude Code)
+        skill_yaml_src = skill_src / "skill.yaml"
+        skill_yaml_dst = skill_dst / "skill.yaml"
+        if skill_yaml_src.exists():
+            shutil.copy2(skill_yaml_src, skill_yaml_dst)
+            print(f"✅ Skill installed to {skill_dst}")
+        else:
+            print(f"⚠️  Warning: skill.yaml not found in {skill_src}")
 
     # Install commands
     commands_dir = claude_dir / "commands"

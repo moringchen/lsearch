@@ -7,7 +7,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from lsearch.config import Config
+from lsearch.config import Config, PathConfig
 from lsearch.server import main as server_main
 
 console = Console()
@@ -73,7 +73,7 @@ def init(name: str | None, path: tuple, model: str):
 
     config = Config(
         name=name,
-        paths=[{"path": p, "session_only": False} for p in paths],
+        paths=[PathConfig(path=p, session_only=False) for p in paths],
         embedding_model=model,
     )
 
@@ -104,7 +104,7 @@ def add_path(path: str):
     else:
         config = Config()
 
-    config.paths.append({"path": path, "session_only": False})
+    config.paths.append(PathConfig(path=path, session_only=False))
     config.to_file(config_path)
 
     console.print(f"[green]Added path: {path}[/green]")

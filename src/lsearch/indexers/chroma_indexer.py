@@ -58,12 +58,16 @@ class ChromaIndexer:
             chunk_id = self._generate_id(file_path, i)
             ids.append(chunk_id)
             documents.append(chunk["text"])
-            metadatas.append({
+            # Build metadata, excluding empty lists (ChromaDB doesn't accept them)
+            metadata = {
                 "file_path": file_path,
                 "chunk_index": i,
                 "title": chunk.get("title", ""),
-                "links": chunk.get("links", []),
-            })
+            }
+            links = chunk.get("links", [])
+            if links:
+                metadata["links"] = links
+            metadatas.append(metadata)
 
         # Generate embeddings and add to collection
         embeddings = self.embedding.embed(documents)

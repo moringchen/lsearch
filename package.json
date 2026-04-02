@@ -1,0 +1,40 @@
+{
+  "name": "@moringchen/lsearch",
+  "version": "0.1.0",
+  "description": "Local RAG knowledge base for Claude Code - semantic + keyword hybrid search",
+  "main": "install.js",
+  "bin": {
+    "lsearch-install": "./install.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js",
+    "install:lsearch": "node install.js"
+  },
+  "keywords": [
+    "claude",
+    "rag",
+    "search",
+    "knowledge-base",
+    "mcp",
+    "semantic-search",
+    "claude-code"
+  ],
+  "author": "moringchen <843115404@qq.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moringchen/lsearch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/moringchen/lsearch/issues"
+  },
+  "homepage": "https://github.com/moringchen/lsearch#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "install.js",
+    "README.md",
+    "LICENSE"
+  ]
+}

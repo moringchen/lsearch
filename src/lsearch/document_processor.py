@@ -138,9 +138,17 @@ class DocumentProcessor:
 
         # Check exclude patterns
         for pattern in self.config.exclude_patterns:
-            if fnmatch.fnmatch(str(path), pattern):
-                return False
+            # Check exact name match
             if fnmatch.fnmatch(path.name, pattern):
+                return False
+            # Check if any part of the path matches directory patterns
+            if '**' in pattern:
+                # Convert **/dir/** or dir/** to check if dir is in path parts
+                dir_name = pattern.replace('/**', '').replace('**/', '')
+                if dir_name in path.parts:
+                    return False
+            # Check full path match
+            if fnmatch.fnmatch(str(path), pattern):
                 return False
 
         # Only index markdown files for now
