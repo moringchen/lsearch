@@ -185,9 +185,17 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             type="text",
             text="""⚠️ lsearch is not initialized in this project.
 
-Please run `/lsearch-init` first to set up the knowledge base.
+Please run `lsearch init` in your terminal first to set up the knowledge base.
 
-This will create a `.lsearch/config.yaml` file in your project directory."""
+This will launch an interactive TUI where you can configure:
+  • Knowledge base name
+  • Documentation paths to index
+  • Embedding model
+
+The configuration will be saved to `.lsearch/config.yaml` in your project directory.
+
+Or use non-interactive mode:
+  lsearch init --no-interactive --name my-project --path ./docs"""
         )]
 
     # Initialize on first call (after checking initialization)
@@ -232,7 +240,7 @@ def _init_config() -> None:
 
 
 async def _handle_init(arguments: dict) -> list[TextContent]:
-    """Handle init tool - interactive guided setup for lsearch."""
+    """Handle init tool - redirects users to terminal TUI."""
     global _config, _searcher, _processor, _builder, _project_dir
 
     # Check if already initialized
@@ -246,9 +254,10 @@ async def _handle_init(arguments: dict) -> list[TextContent]:
 
 Configuration file: `{existing_config_dir}/config.yaml`
 
-To re-initialize with different settings, use:
-```
-/lsearch-init --force
+To re-initialize with different settings, delete the config and run:
+```bash
+rm -rf {existing_config_dir}
+lsearch init
 ```"""
         )]
 
@@ -264,134 +273,131 @@ To re-initialize with different settings, use:
     model = arguments.get("model")
     confirm = arguments.get("confirm", False)
 
-    # Step 1: Welcome and ask for name
-    if name is None:
-        return [TextContent(
-            type="text",
-            text=f"""🚀 Welcome to lsearch setup!
+    # If running with confirm flag, actually create the config
+    if confirm and name and paths and model:
+        # Parse paths
+        if isinstance(paths, str):
+            paths_list = [p.strip() for p in paths.split(",")]
+        elif isinstance(paths, list):
+            paths_list = paths
+        else:
+            paths_list = ["./docs"]
 
-I'll help you configure a local knowledge base for this project.
+        # Final step: Create configuration
+        try:
+            config = Config(
+                name=name,
+                paths=[PathConfig(path=p, session_only=False) for p in paths_list],
+                embedding_model=model,
+            )
 
-📁 Current directory: `{cwd}`
+            # Save to current directory
+            config_dir = cwd / ".lsearch"
+            config_dir.mkdir(parents=True, exist_ok=True)
+            config_file = config_dir / "config.yaml"
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 1/4: Knowledge Base Name
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            config.to_file(config_file)
 
-This identifies your knowledge base. Default is based on your directory.
+            # Initialize global state
+            _project_dir = config_dir
+            _config = config
+            _searcher = HybridSearcher(_config, _project_dir)
+            _processor = DocumentProcessor(_config)
+            _builder = ContextBuilder(_config)
 
-💡 Suggested name: `{default_name}`
-
-To proceed, run:
-```
-/lsearch-init --name {default_name}
-```
-
-Or choose your own name:
-```
-/lsearch-init --name my-project-name
-```"""
-        )]
-
-    # Step 2: Ask for paths
-    if paths is None:
-        return [TextContent(
-            type="text",
-            text=f"""✓ Name set to: `{name}`
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 2/4: Documentation Paths
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Which directories or files should be indexed?
-
-💡 Common choices:
-  • `./docs` - Documentation folder (default)
-  • `./README.md` - Main readme file
-  • `./src` - Source code with markdown comments
-  • Multiple: `./docs,./README.md`
-
-To use default (./docs), run:
-```
-/lsearch-init --name {name} --paths ./docs
-```
-
-Or specify custom paths:
-```
-/lsearch-init --name {name} --paths ./docs,./README.md
-```"""
-        )]
-
-    # Parse paths for display and validation
-    if isinstance(paths, str):
-        paths_list = [p.strip() for p in paths.split(",")]
-    elif isinstance(paths, list):
-        paths_list = paths
-    else:
-        paths_list = ["./docs"]
-
-    paths_str = ",".join(paths_list)
-
-    # Step 3: Ask for model
-    if model is None:
-        return [TextContent(
-            type="text",
-            text=f"""✓ Paths set to: `{paths_str}`
+            paths_display_final = "\n".join(f"    • {p}" for p in paths_list)
+            return [TextContent(
+                type="text",
+                text=f"""✅ lsearch initialized successfully!
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 3/4: Embedding Model
+Configuration Created
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Choose an embedding model for semantic search:
-
-1️⃣  `bge-small-zh` (Recommended for Chinese)
-   • Size: ~300MB
-   • Best for: Chinese documents
-   • Language: Chinese-optimized
-
-2️⃣  `all-MiniLM-L6-v2` (Small & fast)
-   • Size: ~70MB
-   • Best for: English general purpose
-   • Language: English
-
-3️⃣  `bge-small-en` (English-optimized)
-   • Size: ~130MB
-   • Best for: English documents
-   • Language: English-optimized
-
-To select, run one of:
-```
-/lsearch-init --name {name} --paths {paths_str} --model bge-small-zh
-/lsearch-init --name {name} --paths {paths_str} --model all-MiniLM-L6-v2
-/lsearch-init --name {name} --paths {paths_str} --model bge-small-en
-```"""
-        )]
-
-    # Step 4: Confirm and create
-    if not confirm:
-        paths_display = "\n".join(f"    • {p}" for p in paths_list)
-        return [TextContent(
-            type="text",
-            text=f"""✓ Model set to: `{model}`
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 4/4: Confirm Configuration
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Summary:
+📋 Settings:
     Knowledge base name: {name}
     Documentation paths:
-{paths_display}
+{paths_display_final}
     Embedding model: {model}
-    Config location: {cwd}/.lsearch/config.yaml
+    Config file: {config_file}
 
-To create this configuration, run:
-```
-/lsearch-init --name {name} --paths {paths_str} --model {model} --confirm
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Next Steps
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  Create your documentation directory:
+    ```bash
+    mkdir -p {' '.join(paths_list)}
+    ```
+
+2️⃣  Add markdown files to your docs
+
+3️⃣  Index your documents:
+    ```
+    /lsearch-index
+    ```
+
+4️⃣  Start searching:
+    ```
+    /lsearch your search query
+    ```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Available Commands
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• /lsearch <query>     - Search knowledge base
+• /lsearch-index       - Index documents
+• /lsearch-fetch <url> - Fetch and index web page
+• /lsearch-add <path>  - Add temporary path
+• /lsearch-stats       - Show statistics
+• /kb <query>          - Force search knowledge base"""
+            )]
+        except Exception as e:
+            return [TextContent(
+                type="text",
+                text=f"❌ Error creating configuration: {e}\n\nPlease try again or check permissions."
+            )]
+
+    # Otherwise, recommend terminal TUI
+    return [TextContent(
+        type="text",
+        text=f"""🚀 Welcome to lsearch setup!
+
+💡 **Recommended: Use the terminal TUI for best experience**
+
+Run this in your terminal (not in Claude Code):
+```bash
+lsearch init
 ```
 
-Or start over with different settings."""
-        )]
+This launches an interactive TUI with keyboard navigation:
+  • ↑↓ to navigate
+  • Space to select
+  • Enter to confirm
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Quick Init (Non-interactive)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Or use the quick non-interactive mode:
+```bash
+lsearch init --no-interactive --name {default_name} --path ./docs --model bge-small-zh
+```
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MCP Tool Init (Advanced)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Alternatively, you can use the MCP init tool with parameters:
+```
+/init --name {default_name} --paths ./docs --model bge-small-zh --confirm
+```
+
+Available models:
+  • `bge-small-zh` - Chinese-optimized (~300MB)
+  • `all-MiniLM-L6-v2` - English general purpose (~70MB)
+  • `bge-small-en` - English-optimized (~130MB)"""
+    )]
 
     # Final step: Create configuration
     try:

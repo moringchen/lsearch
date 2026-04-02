@@ -29,11 +29,11 @@
 # 克隆到 Claude 插件目录
 git clone https://github.com/moringchen/lsearch.git ~/.claude/plugins/lsearch
 
-# 运行安装脚本
+# 运行安装脚本（重要：斜杠命令需要此步骤）
 cd ~/.claude/plugins/lsearch && python install.py
 ```
 
-然后重启 Claude Code。
+**⚠️ 安装后必须重启 Claude Code，斜杠命令（`/lsearch`、`/lsearch-index` 等）才会生效。**
 
 ### 方式 2：npx 安装（推荐）
 
@@ -79,60 +79,50 @@ pip install -e ".[dev]"
 
 ## 快速开始
 
-**⚠️ 重要：在使用任何其他 lsearch 命令之前，必须先运行 `/lsearch-init`！**
+### 1. 初始化知识库（终端交互式 TUI）
 
-### 1. 初始化知识库（交互式设置）
+**⚠️ 重要：必须先初始化 lsearch 才能使用！**
 
-在 Claude Code 中运行：
+在**本地终端**（不是 Claude Code）中运行：
 
-```
-/lsearch-init
-```
-
-这将启动一个交互式的 4 步设置向导：
-
-**第 1 步：知识库名称**
-```
-/lsearch-init --name my-project
-```
-
-**第 2 步：文档路径**
-```
-/lsearch-init --name my-project --paths ./docs,./README.md
-```
-
-**第 3 步：嵌入模型**
-```
-/lsearch-init --name my-project --paths ./docs --model bge-small-zh
-```
-
-**第 4 步：确认创建**
-```
-/lsearch-init --name my-project --paths ./docs --model bge-small-zh --confirm
-```
-
-这将在你的项目目录中创建 `.lsearch/config.yaml` 配置文件。
-
-**重新初始化**（不同的设置或路径）：
-```
-/lsearch-init --force
-```
-
-或者使用 CLI：
 ```bash
-# 在你的项目目录中
-# 自动根据目录生成名称，默认使用 ./docs 路径
 lsearch init
+```
 
-# 或自定义名称和路径
-lsearch init --name my-project --path ./docs --path ./README.md
+这将启动一个带键盘导航的交互式 TUI：
+
+| 按键 | 操作 |
+|-----|------|
+| ↑ ↓ | 上下导航 |
+| 空格 | 选择/取消（复选框）|
+| 回车 | 确认选择 |
+| Ctrl+C | 取消 |
+
+**配置步骤：**
+1. **知识库名称** - 编辑或接受建议的名称
+2. **文档路径** - 选择要索引的路径（空格切换）
+3. **嵌入模型** - 从 3 个模型中选择（↑↓ 导航）
+4. **确认创建** - 查看设置并创建配置
+
+这将在项目目录中创建 `.lsearch/config.yaml` 配置文件。
+
+**使用默认值快速初始化（无 TUI）：**
+```bash
+lsearch init --no-interactive --name my-project --path ./docs --model bge-small-zh
+```
+
+### 2. 索引文档
+
+在 Claude Code 中：
+```
+/lsearch-index
 ```
 
 **自动生成的名称：**
 - 如果在 `/home/user/projects/my-app` 中运行，名称将为：`my-app`
 - 如果 `my-app` 已存在，名称将为：`projects-my-app`
 
-这会创建 `.lsearch/config.yaml`：
+这将创建 `.lsearch/config.yaml`：
 
 ```yaml
 name: my-project
@@ -146,15 +136,12 @@ token_limit: 4000
 auto_expand_links: true
 ```
 
-### 2. 在 Claude Code 中使用
+### 3. 在 Claude Code 中使用
 
-**⚠️ 必须先运行 `/lsearch-init`！**
-
-配置完成后，在 Claude Code 中使用以下触发方式：
+初始化完成后（通过终端 `lsearch init`），在 Claude Code 中使用以下触发方式：
 
 | 触发方式 | 说明 | 示例 |
 |---------|------|------|
-| `/lsearch-init` | **初始化知识库（必须先运行）** | `/lsearch-init` |
 | `lsearch: <查询>` | 自动触发 RAG 搜索 | `lsearch: 认证如何工作？` |
 | `@kb <查询>` | 强制触发知识库搜索 | `@kb 部署流程` |
 | **关键词触发** | 特定关键词自动触发 | 见下方 |
@@ -241,8 +228,11 @@ chunk_overlap: 50                         # 块之间重叠字数
 ## CLI 命令
 
 ```bash
-# 初始化知识库
-lsearch init --name my-project --path ./docs
+# 初始化知识库（交互式 TUI）
+lsearch init
+
+# 快速初始化（无交互）
+lsearch init --no-interactive --name my-project --path ./docs
 
 # 向现有知识库添加路径
 lsearch add-path ./more-docs
@@ -265,15 +255,15 @@ lsearch server
 # 进入你的项目目录
 cd ~/projects/my-web-app
 
-# 第 1 步：初始化 lsearch（在 Claude Code 中）
-/lsearch-init
+# 第 1 步：在终端初始化 lsearch
+lsearch init
 
 # 创建 docs 目录并添加文件
 mkdir -p docs
 echo "# API 文档" > docs/api.md
 echo "# 部署指南" > docs/deployment.md
 
-# 第 2 步：索引文档（在 Claude Code 中）
+# 第 2 步：在 Claude Code 中索引文档
 /lsearch-index
 
 # 第 3 步：搜索你的文档
@@ -284,14 +274,12 @@ lsearch: 如何部署这个项目？
 
 ```bash
 # 使用中文优化模型初始化（默认）
-lsearch init --name backend-api
+lsearch init
 
-# 添加多个文档路径
-lsearch init --name fullstack \
-  --path ./backend/docs \
-  --path ./frontend/docs \
-  --path ./README.md \
-  --model bge-small-zh
+# 在 TUI 中选择多个路径：
+# - ./backend/docs
+# - ./frontend/docs
+# - ./README.md
 ```
 
 ### 示例 3：网页文档

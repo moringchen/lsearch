@@ -78,59 +78,43 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-**⚠️ IMPORTANT: You must run `/lsearch-init` first before using any other lsearch commands!**
+### 1. Initialize Knowledge Base (Terminal Interactive TUI)
 
-### 1. Initialize Knowledge Base (Interactive Setup)
+**⚠️ IMPORTANT: You must initialize lsearch before using it!**
 
-In Claude Code, run:
+Open your **local terminal** (not Claude Code) and run:
 
-```
-/lsearch-init
-```
-
-This starts an interactive 4-step setup:
-
-**Step 1: Knowledge Base Name**
-```
-/lsearch-init --name my-project
+```bash
+lsearch init
 ```
 
-**Step 2: Documentation Paths**
-```
-/lsearch-init --name my-project --paths ./docs,./README.md
-```
+This launches an interactive TUI with keyboard navigation:
 
-**Step 3: Embedding Model**
-```
-/lsearch-init --name my-project --paths ./docs --model bge-small-zh
-```
+| Key | Action |
+|-----|--------|
+| ↑ ↓ | Navigate up/down |
+| Space | Select/deselect (checkbox) |
+| Enter | Confirm selection |
+| Ctrl+C | Cancel |
 
-**Step 4: Confirm**
-```
-/lsearch-init --name my-project --paths ./docs --model bge-small-zh --confirm
-```
+**Configuration steps:**
+1. **Knowledge Base Name** - Edit or accept the suggested name
+2. **Documentation Paths** - Select paths to index (Space to toggle)
+3. **Embedding Model** - Choose from 3 models (↑↓ to navigate)
+4. **Confirm & Create** - Review settings and create config
 
-This creates `.lsearch/config.yaml` in your project directory with your specified settings.
+This creates `.lsearch/config.yaml` in your project directory.
 
-**To re-initialize** (different settings or paths):
-```
-/lsearch-init --force
+**Quick init with defaults (no TUI):**
+```bash
+lsearch init --no-interactive --name my-project --path ./docs --model bge-small-zh
 ```
 
 ### 2. Index Your Documents
 
+In Claude Code:
 ```
 /lsearch-index
-```
-
-Or via CLI:
-```bash
-# In your project directory
-# Auto-generates name from directory, uses ./docs as default path
-lsearch init
-
-# Or customize name and paths
-lsearch init --name my-project --path ./docs --path ./README.md
 ```
 
 **Auto-generated names:**
@@ -153,13 +137,10 @@ auto_expand_links: true
 
 ### 3. Use in Claude Code
 
-**⚠️ You must run `/lsearch-init` first!**
-
-Once initialized, use these triggers in Claude Code:
+Once initialized (via `lsearch init` in terminal), use these triggers in Claude Code:
 
 | Trigger | Description | Example |
 |---------|-------------|---------|
-| `/lsearch-init` | **Initialize knowledge base (REQUIRED FIRST)** | `/lsearch-init` |
 | `lsearch: <query>` | Automatic RAG search | `lsearch: How does auth work?` |
 | `@kb <query>` | Force knowledge base search | `@kb deployment process` |
 | `/lsearch <query>` | Search via slash command | `/lsearch API documentation` |
@@ -269,8 +250,8 @@ lsearch server
 # Navigate to your project
 cd ~/projects/my-web-app
 
-# Step 1: Initialize lsearch (in Claude Code)
-/lsearch-init
+# Step 1: Initialize lsearch (in terminal)
+lsearch init
 
 # Create docs directory and add files
 mkdir -p docs
