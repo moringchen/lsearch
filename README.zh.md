@@ -81,7 +81,7 @@ pip install -e ".[dev]"
 
 **⚠️ 重要：在使用任何其他 lsearch 命令之前，必须先运行 `/lsearch-init`！**
 
-### 1. 初始化知识库
+### 1. 初始化知识库（交互式设置）
 
 在 Claude Code 中运行：
 
@@ -89,10 +89,29 @@ pip install -e ".[dev]"
 /lsearch-init
 ```
 
-这将：
-- 在你的项目目录中创建 `.lsearch/config.yaml`
-- 根据目录名生成知识库名称
-- 设置 `./docs` 为默认文档路径
+这将启动一个交互式的 4 步设置向导：
+
+**第 1 步：知识库名称**
+```
+/lsearch-init --name my-project
+```
+
+**第 2 步：文档路径**
+```
+/lsearch-init --name my-project --paths ./docs,./README.md
+```
+
+**第 3 步：嵌入模型**
+```
+/lsearch-init --name my-project --paths ./docs --model bge-small-zh
+```
+
+**第 4 步：确认创建**
+```
+/lsearch-init --name my-project --paths ./docs --model bge-small-zh --confirm
+```
+
+这将在你的项目目录中创建 `.lsearch/config.yaml` 配置文件。
 
 **重新初始化**（不同的设置或路径）：
 ```

@@ -80,7 +80,7 @@ pip install -e ".[dev]"
 
 **⚠️ IMPORTANT: You must run `/lsearch-init` first before using any other lsearch commands!**
 
-### 1. Initialize Knowledge Base
+### 1. Initialize Knowledge Base (Interactive Setup)
 
 In Claude Code, run:
 
@@ -88,10 +88,29 @@ In Claude Code, run:
 /lsearch-init
 ```
 
-This will:
-- Create `.lsearch/config.yaml` in your project directory
-- Generate a knowledge base name from your directory
-- Set up `./docs` as the default documentation path
+This starts an interactive 4-step setup:
+
+**Step 1: Knowledge Base Name**
+```
+/lsearch-init --name my-project
+```
+
+**Step 2: Documentation Paths**
+```
+/lsearch-init --name my-project --paths ./docs,./README.md
+```
+
+**Step 3: Embedding Model**
+```
+/lsearch-init --name my-project --paths ./docs --model bge-small-zh
+```
+
+**Step 4: Confirm**
+```
+/lsearch-init --name my-project --paths ./docs --model bge-small-zh --confirm
+```
+
+This creates `.lsearch/config.yaml` in your project directory with your specified settings.
 
 **To re-initialize** (different settings or paths):
 ```
