@@ -1,6 +1,6 @@
 {
   "name": "@moringchen/lsearch",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Local RAG knowledge base for Claude Code - semantic + keyword hybrid search",
   "main": "install.js",
   "bin": {
