@@ -20,6 +20,7 @@ _searcher: HybridSearcher | None = None
 _processor: DocumentProcessor | None = None
 _builder: ContextBuilder | None = None
 _session_paths: list[PathConfig] = []
+_project_dir: Path | None = None
 
 server = Server("lsearch")
 
@@ -29,8 +30,37 @@ async def list_tools() -> list[Tool]:
     """List available tools."""
     return [
         Tool(
+            name="init",
+            description="Initialize lsearch configuration for the current project. MUST be run before using other lsearch tools.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Knowledge base name (default: auto-generated from directory)",
+                    },
+                    "paths": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Paths to include in the knowledge base (default: ['./docs'])",
+                    },
+                    "model": {
+                        "type": "string",
+                        "enum": ["bge-small-zh", "all-MiniLM-L6-v2", "bge-small-en"],
+                        "description": "Embedding model to use",
+                        "default": "bge-small-zh",
+                    },
+                    "force": {
+                        "type": "boolean",
+                        "description": "Force re-initialization even if already configured",
+                        "default": False,
+                    },
+                },
+            },
+        ),
+        Tool(
             name="search",
-            description="Search the knowledge base using hybrid semantic + keyword search",
+            description="Search the knowledge base using hybrid semantic + keyword search. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -54,7 +84,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="search_with_context",
-            description="Search and return formatted context ready for LLM consumption",
+            description="Search and return formatted context ready for LLM consumption. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -73,7 +103,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="index",
-            description="Manually trigger indexing of knowledge base paths",
+            description="Manually trigger indexing of knowledge base paths. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -86,7 +116,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="fetch_url",
-            description="Fetch a URL and add to knowledge base",
+            description="Fetch a URL and add to knowledge base. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -104,7 +134,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="add_path",
-            description="Add a temporary path to the current session's knowledge base",
+            description="Add a temporary path to the current session's knowledge base. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -118,7 +148,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="list_paths",
-            description="List all configured knowledge base paths",
+            description="List all configured knowledge base paths. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {},
@@ -126,7 +156,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="get_stats",
-            description="Get knowledge base statistics",
+            description="Get knowledge base statistics. Requires initialization first.",
             inputSchema={
                 "type": "object",
                 "properties": {},
@@ -138,9 +168,24 @@ async def list_tools() -> list[Tool]:
 @server.call_tool()
 async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     """Handle tool calls."""
-    global _config, _searcher, _processor, _builder, _session_paths
+    global _config, _searcher, _processor, _builder, _session_paths, _project_dir
 
-    # Initialize on first call
+    # Handle init tool separately (doesn't require existing config)
+    if name == "init":
+        return await _handle_init(arguments)
+
+    # Check if project is initialized for all other tools
+    if not Config.is_initialized():
+        return [TextContent(
+            type="text",
+            text="""⚠️ lsearch is not initialized in this project.
+
+Please run `/lsearch-init` first to set up the knowledge base.
+
+This will create a `.lsearch/config.yaml` file in your project directory."""
+        )]
+
+    # Initialize on first call (after checking initialization)
     if _config is None:
         _init_config()
 
@@ -164,20 +209,116 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
 def _init_config() -> None:
     """Initialize configuration and components."""
-    global _config, _searcher, _processor, _builder
+    global _config, _searcher, _processor, _builder, _project_dir
 
-    # Try to load project config
-    temp_config = Config()
-    config_path = temp_config.get_current_config_path()
+    # Find project config directory
+    _project_dir = Config.get_project_config_dir()
 
-    if config_path:
+    if _project_dir:
+        config_path = _project_dir / "config.yaml"
         _config = Config.from_file(config_path)
     else:
+        # This should not happen if we check initialization first
         _config = Config()
 
-    _searcher = HybridSearcher(_config)
+    _searcher = HybridSearcher(_config, _project_dir)
     _processor = DocumentProcessor(_config)
     _builder = ContextBuilder(_config)
+
+
+async def _handle_init(arguments: dict) -> list[TextContent]:
+    """Handle init tool - initialize lsearch configuration."""
+    global _config, _searcher, _processor, _builder, _project_dir
+
+    # Check if already initialized
+    force = arguments.get("force", False)
+    existing_config_dir = Config.get_project_config_dir()
+
+    if existing_config_dir and not force:
+        return [TextContent(
+            type="text",
+            text=f"""✅ lsearch is already initialized in this project.
+
+Configuration file: `{existing_config_dir}/config.yaml`
+
+To re-initialize with different settings, use:
+```
+/lsearch-init --force
+```"""
+        )]
+
+    # Get initialization parameters
+    name = arguments.get("name")
+    paths = arguments.get("paths", ["./docs"])
+    model = arguments.get("model", "bge-small-zh")
+
+    # Auto-generate name from current directory if not provided
+    cwd = Path.cwd()
+    if name is None:
+        name = cwd.name
+        # Check if index exists with this name in parent
+        parent = cwd.parent
+        if parent.name and parent != cwd:
+            potential_name = f"{parent.name}-{name}"
+            # Just use the simple name for now
+
+    # Create configuration
+    config = Config(
+        name=name,
+        paths=[PathConfig(path=p, session_only=False) for p in paths],
+        embedding_model=model,
+    )
+
+    # Save to current directory
+    config_dir = cwd / ".lsearch"
+    config_dir.mkdir(exist_ok=True)
+    config_file = config_dir / "config.yaml"
+
+    config.to_file(config_file)
+
+    # Initialize global state
+    _project_dir = config_dir
+    _config = config
+    _searcher = HybridSearcher(_config, _project_dir)
+    _processor = DocumentProcessor(_config)
+    _builder = ContextBuilder(_config)
+
+    return [TextContent(
+        type="text",
+        text=f"""✅ lsearch initialized successfully!
+
+**Configuration:**
+- Name: `{name}`
+- Paths: {', '.join(paths)}
+- Model: `{model}`
+- Config file: `{config_file}`
+
+**Next steps:**
+1. Create your documentation directory:
+   ```bash
+   mkdir -p {' '.join(paths)}
+   ```
+
+2. Add markdown files to your docs directory
+
+3. Index your documents:
+   ```
+   /lsearch-index
+   ```
+
+4. Start searching:
+   ```
+   /lsearch your search query
+   ```
+
+**Available commands:**
+- `/lsearch <query>` - Search knowledge base
+- `/lsearch-index` - Index documents
+- `/lsearch-fetch <url>` - Fetch and index web page
+- `/lsearch-add <path>` - Add temporary path
+- `/lsearch-stats` - Show statistics
+- `/kb <query>` - Force search knowledge base"""
+    )]
 
 
 async def _handle_search(arguments: dict) -> list[TextContent]:
@@ -310,8 +451,11 @@ async def _handle_fetch_url(arguments: dict) -> list[TextContent]:
         # Generate filename
         filename = fetcher.get_filename_from_url(url, fetched_title)
 
-        # Save to global fetch directory
-        fetch_dir = Config.get_global_dir() / "fetched"
+        # Save to project-local fetched directory or global as fallback
+        if _project_dir:
+            fetch_dir = _project_dir / "fetched"
+        else:
+            fetch_dir = Config.get_global_dir() / "fetched"
         fetch_dir.mkdir(parents=True, exist_ok=True)
 
         file_path = fetch_dir / filename

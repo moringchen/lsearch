@@ -13,9 +13,10 @@ from lsearch.embedding import get_embedding_manager
 class ChromaIndexer:
     """Manages vector indexing using ChromaDB."""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, project_dir: Path | None = None):
         self.config = config
-        self.index_dir = Config.get_index_dir(config.name) / "chroma"
+        # Use project-local index directory
+        self.index_dir = Config.get_index_dir(config.name, project_dir) / "chroma"
         self.index_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize Chroma client with persistence

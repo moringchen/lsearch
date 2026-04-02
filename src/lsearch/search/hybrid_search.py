@@ -1,5 +1,6 @@
 """Hybrid search combining vector and BM25 results."""
 
+from pathlib import Path
 from typing import List, Dict, Any
 from collections import defaultdict
 
@@ -10,11 +11,12 @@ from lsearch.indexers import ChromaIndexer, BM25Indexer, LinkGraph
 class HybridSearcher:
     """Combines vector search (Chroma) and keyword search (BM25) using RRF."""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, project_dir: Path | None = None):
         self.config = config
-        self.chroma = ChromaIndexer(config)
-        self.bm25 = BM25Indexer(config)
-        self.link_graph = LinkGraph(config)
+        self.project_dir = project_dir
+        self.chroma = ChromaIndexer(config, project_dir)
+        self.bm25 = BM25Indexer(config, project_dir)
+        self.link_graph = LinkGraph(config, project_dir)
         self.k = 60  # RRF constant
 
     def search(

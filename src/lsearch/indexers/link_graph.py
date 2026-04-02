@@ -11,9 +11,9 @@ from lsearch.config import Config
 class LinkGraph:
     """Manages bidirectional link relationships between notes."""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, project_dir: Path | None = None):
         self.config = config
-        self.graph_file = Config.get_index_dir(config.name) / "link_graph.json"
+        self.graph_file = Config.get_index_dir(config.name, project_dir) / "link_graph.json"
         self.graph = nx.DiGraph()
         self._load()
 

@@ -94,14 +94,43 @@ class Config:
 
     @classmethod
     def get_global_dir(cls) -> Path:
-        """Get the global lsearch directory."""
+        """Get the global lsearch directory (for backwards compatibility)."""
         home = Path.home()
         return home / ".lsearch"
 
     @classmethod
-    def get_index_dir(cls, name: str) -> Path:
-        """Get the index directory for a knowledge base."""
+    def get_project_config_dir(cls, cwd: Path | None = None) -> Path | None:
+        """Find the project config directory by walking up from cwd."""
+        if cwd is None:
+            cwd = Path.cwd()
+        for parent in [cwd] + list(cwd.parents):
+            config_dir = parent / ".lsearch"
+            if (config_dir / "config.yaml").exists():
+                return config_dir
+        return None
+
+    @classmethod
+    def get_index_dir(cls, name: str, project_dir: Path | None = None) -> Path:
+        """Get the index directory for a knowledge base.
+
+        Stores indices in the project directory under .lsearch/indices/.
+        Falls back to global directory only if no project config found.
+        """
+        if project_dir is not None:
+            return project_dir / "indices" / name
+
+        # Try to find project config first
+        config_dir = cls.get_project_config_dir()
+        if config_dir:
+            return config_dir / "indices" / name
+
+        # Fall back to global directory for backwards compatibility
         return cls.get_global_dir() / "indices" / name
+
+    @classmethod
+    def is_initialized(cls, cwd: Path | None = None) -> bool:
+        """Check if the current project has been initialized."""
+        return cls.get_project_config_dir(cwd) is not None
 
     def get_current_config_path(self) -> Optional[Path]:
         """Find the current project's config file."""

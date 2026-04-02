@@ -16,9 +16,10 @@ from lsearch.config import Config
 class BM25Indexer:
     """Manages keyword indexing using Whoosh BM25."""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, project_dir: Path | None = None):
         self.config = config
-        self.index_dir = Config.get_index_dir(config.name) / "bm25"
+        # Use project-local index directory
+        self.index_dir = Config.get_index_dir(config.name, project_dir) / "bm25"
 
         # Define schema
         self.schema = Schema(

@@ -78,8 +78,33 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
+**⚠️ IMPORTANT: You must run `/lsearch-init` first before using any other lsearch commands!**
+
 ### 1. Initialize Knowledge Base
 
+In Claude Code, run:
+
+```
+/lsearch-init
+```
+
+This will:
+- Create `.lsearch/config.yaml` in your project directory
+- Generate a knowledge base name from your directory
+- Set up `./docs` as the default documentation path
+
+**To re-initialize** (different settings or paths):
+```
+/lsearch-init --force
+```
+
+### 2. Index Your Documents
+
+```
+/lsearch-index
+```
+
+Or via CLI:
 ```bash
 # In your project directory
 # Auto-generates name from directory, uses ./docs as default path
@@ -107,12 +132,15 @@ token_limit: 4000
 auto_expand_links: true
 ```
 
-### 2. Use in Claude Code
+### 3. Use in Claude Code
 
-Once configured, use these triggers in Claude Code:
+**⚠️ You must run `/lsearch-init` first!**
+
+Once initialized, use these triggers in Claude Code:
 
 | Trigger | Description | Example |
 |---------|-------------|---------|
+| `/lsearch-init` | **Initialize knowledge base (REQUIRED FIRST)** | `/lsearch-init` |
 | `lsearch: <query>` | Automatic RAG search | `lsearch: How does auth work?` |
 | `@kb <query>` | Force knowledge base search | `@kb deployment process` |
 | `/lsearch <query>` | Search via slash command | `/lsearch API documentation` |
@@ -222,18 +250,18 @@ lsearch server
 # Navigate to your project
 cd ~/projects/my-web-app
 
-# Initialize with default settings (auto-generated name, ./docs path)
-lsearch init
+# Step 1: Initialize lsearch (in Claude Code)
+/lsearch-init
 
 # Create docs directory and add files
 mkdir -p docs
 echo "# API Documentation" > docs/api.md
 echo "# Deployment Guide" > docs/deployment.md
 
-# In Claude Code, index the documents
+# Step 2: Index the documents (in Claude Code)
 /lsearch-index
 
-# Search your documentation
+# Step 3: Search your documentation
 lsearch: How do I deploy this project?
 ```
 

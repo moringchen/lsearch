@@ -79,8 +79,27 @@ pip install -e ".[dev]"
 
 ## 快速开始
 
+**⚠️ 重要：在使用任何其他 lsearch 命令之前，必须先运行 `/lsearch-init`！**
+
 ### 1. 初始化知识库
 
+在 Claude Code 中运行：
+
+```
+/lsearch-init
+```
+
+这将：
+- 在你的项目目录中创建 `.lsearch/config.yaml`
+- 根据目录名生成知识库名称
+- 设置 `./docs` 为默认文档路径
+
+**重新初始化**（不同的设置或路径）：
+```
+/lsearch-init --force
+```
+
+或者使用 CLI：
 ```bash
 # 在你的项目目录中
 # 自动根据目录生成名称，默认使用 ./docs 路径
@@ -110,10 +129,13 @@ auto_expand_links: true
 
 ### 2. 在 Claude Code 中使用
 
+**⚠️ 必须先运行 `/lsearch-init`！**
+
 配置完成后，在 Claude Code 中使用以下触发方式：
 
 | 触发方式 | 说明 | 示例 |
 |---------|------|------|
+| `/lsearch-init` | **初始化知识库（必须先运行）** | `/lsearch-init` |
 | `lsearch: <查询>` | 自动触发 RAG 搜索 | `lsearch: 认证如何工作？` |
 | `@kb <查询>` | 强制触发知识库搜索 | `@kb 部署流程` |
 | **关键词触发** | 特定关键词自动触发 | 见下方 |
@@ -224,18 +246,18 @@ lsearch server
 # 进入你的项目目录
 cd ~/projects/my-web-app
 
-# 使用默认设置初始化（自动生成名称，./docs 路径）
-lsearch init
+# 第 1 步：初始化 lsearch（在 Claude Code 中）
+/lsearch-init
 
 # 创建 docs 目录并添加文件
 mkdir -p docs
 echo "# API 文档" > docs/api.md
 echo "# 部署指南" > docs/deployment.md
 
-# 在 Claude Code 中索引文档
+# 第 2 步：索引文档（在 Claude Code 中）
 /lsearch-index
 
-# 搜索你的文档
+# 第 3 步：搜索你的文档
 lsearch: 如何部署这个项目？
 ```
 
