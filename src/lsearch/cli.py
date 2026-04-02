@@ -47,6 +47,59 @@ def generate_kb_name(cwd: Path) -> str:
     return name
 
 
+def list_existing_configs() -> list[Path]:
+    """List all existing knowledge base configs in parent directories."""
+    configs = []
+    cwd = Path.cwd()
+
+    # Check current and parent directories
+    for parent in [cwd] + list(cwd.parents):
+        config_file = parent / ".lsearch" / "config.yaml"
+        if config_file.exists():
+            try:
+                config = Config.from_file(config_file)
+                configs.append((parent, config))
+            except Exception:
+                pass
+
+    return configs
+
+
+def display_existing_configs(configs: list[tuple[Path, Config]]):
+    """Display existing configurations in a table."""
+    if not configs:
+        return
+
+    console.print()
+    table = Table(title="📚 Existing Knowledge Bases")
+    table.add_column("#", style="cyan", justify="center")
+    table.add_column("Name", style="green")
+    table.add_column("Directory", style="dim")
+    table.add_column("Paths", style="yellow")
+    table.add_column("Model", style="magenta")
+
+    for i, (path, config) in enumerate(configs, 1):
+        paths_str = ", ".join([p.path for p in config.paths[:2]])
+        if len(config.paths) > 2:
+            paths_str += f" (+{len(config.paths) - 2} more)"
+
+        # Truncate path if too long
+        path_str = str(path)
+        if len(path_str) > 40:
+            path_str = "..." + path_str[-37:]
+
+        table.add_row(
+            str(i),
+            config.name,
+            path_str,
+            paths_str,
+            config.embedding_model
+        )
+
+    console.print(table)
+    console.print()
+
+
 def run_interactive_init():
     """Run interactive initialization wizard using questionary."""
     cwd = Path.cwd()
@@ -61,21 +114,192 @@ def run_interactive_init():
     ))
     console.print(f"\n📁 Current directory: [dim]{cwd}[/dim]\n")
 
-    # Check if already initialized
-    existing_config = Config.get_project_config_dir()
-    if existing_config:
-        console.print(f"[yellow]⚠️  lsearch is already initialized in this project.[/yellow]")
-        console.print(f"   Config file: [dim]{existing_config}/config.yaml[/dim]\n")
+    # Check for existing configurations
+    existing_configs = list_existing_configs()
 
-        reinit = questionary.confirm(
-            "Do you want to re-initialize with new settings?",
-            default=False
+    if existing_configs:
+        display_existing_configs(existing_configs)
+
+        # Ask what to do
+        action = questionary.select(
+            "What would you like to do?",
+            choices=[
+                questionary.Choice(
+                    "➕  Create NEW knowledge base",
+                    value="new"
+                ),
+                questionary.Choice(
+                    "📝  MODIFY existing knowledge base",
+                    value="modify"
+                ),
+                questionary.Choice(
+                    "🗑️  OVERWRITE (delete and recreate)",
+                    value="overwrite"
+                ),
+                questionary.Choice(
+                    "❌  Cancel",
+                    value="cancel"
+                ),
+            ],
+            default="new"
         ).ask()
 
-        if not reinit:
-            console.print("\n[dim]Cancelled. Existing configuration preserved.[/dim]")
+        if action == "cancel":
+            console.print("\n[dim]Cancelled.[/dim]")
             return
-        console.print()
+
+        elif action == "modify":
+            # Select which config to modify
+            if len(existing_configs) == 1:
+                selected_path, selected_config = existing_configs[0]
+            else:
+                choices = [
+                    questionary.Choice(
+                        f"{config.name} ({path})",
+                        value=(path, config)
+                    )
+                    for path, config in existing_configs
+                ]
+                selected = questionary.select(
+                    "Which knowledge base do you want to modify?",
+                    choices=choices
+                ).ask()
+                selected_path, selected_config = selected
+
+            run_modify_config(selected_path, selected_config)
+            return
+
+        elif action == "overwrite":
+            # Select which config to overwrite
+            if len(existing_configs) == 1:
+                selected_path, selected_config = existing_configs[0]
+            else:
+                choices = [
+                    questionary.Choice(
+                        f"{config.name} ({path})",
+                        value=(path, config)
+                    )
+                    for path, config in existing_configs
+                ]
+                selected = questionary.select(
+                    "Which knowledge base do you want to overwrite?",
+                    choices=choices
+                ).ask()
+                selected_path, selected_config = selected
+
+            confirm = questionary.confirm(
+                f"Are you sure you want to DELETE '{selected_config.name}' and recreate it?",
+                default=False
+            ).ask()
+
+            if not confirm:
+                console.print("\n[dim]Cancelled.[/dim]")
+                return
+
+            # Delete existing config
+            config_dir = selected_path / ".lsearch"
+            import shutil
+            if config_dir.exists():
+                shutil.rmtree(config_dir)
+            console.print(f"[yellow]🗑️  Deleted existing config: {selected_config.name}[/yellow]\n")
+
+    # Create new configuration
+    create_new_config(cwd, default_name)
+
+
+def run_modify_config(config_path: Path, config: Config):
+    """Run modification wizard for an existing config."""
+    console.print()
+    console.print(Panel(
+        f"📝 Modifying: {config.name}",
+        border_style="yellow"
+    ))
+
+    # What to modify
+    field_to_modify = questionary.select(
+        "What would you like to modify?",
+        choices=[
+            questionary.Choice("Name", value="name"),
+            questionary.Choice("Documentation Paths", value="paths"),
+            questionary.Choice("Embedding Model", value="model"),
+            questionary.Choice("Cancel", value="cancel"),
+        ]
+    ).ask()
+
+    if field_to_modify == "cancel":
+        console.print("\n[dim]Cancelled.[/dim]")
+        return
+
+    if field_to_modify == "name":
+        new_name = questionary.text(
+            "New knowledge base name:",
+            default=config.name
+        ).ask()
+        if new_name:
+            config.name = new_name
+
+    elif field_to_modify == "paths":
+        current_paths = [p.path for p in config.paths]
+        paths_str = ", ".join(current_paths)
+        new_paths = questionary.text(
+            "Documentation paths (comma-separated):",
+            default=paths_str
+        ).ask()
+        if new_paths:
+            config.paths = [
+                PathConfig(path=p.strip(), session_only=False)
+                for p in new_paths.split(",")
+            ]
+
+    elif field_to_modify == "model":
+        model_choice = questionary.select(
+            "Choose embedding model:",
+            choices=[
+                questionary.Choice(
+                    "🌏  bge-small-zh (Chinese)",
+                    value="bge-small-zh"
+                ),
+                questionary.Choice(
+                    "🇬🇧  all-MiniLM-L6-v2 (English, small)",
+                    value="all-MiniLM-L6-v2"
+                ),
+                questionary.Choice(
+                    "🇬🇧  bge-small-en (English, optimized)",
+                    value="bge-small-en"
+                ),
+            ],
+            default=config.embedding_model
+        ).ask()
+        if model_choice:
+            config.embedding_model = model_choice
+
+    # Save modified config
+    config_file = config_path / ".lsearch" / "config.yaml"
+    config.to_file(config_file)
+
+    console.print()
+    console.print(Panel(
+        Text("✅ Configuration updated!", justify="center", style="bold green"),
+        border_style="green"
+    ))
+
+    # Show updated config
+    table = Table(title="Updated Configuration")
+    table.add_column("Property", style="cyan")
+    table.add_column("Value", style="green")
+    table.add_row("Name", config.name)
+    table.add_row("Paths", ", ".join([p.path for p in config.paths]))
+    table.add_row("Model", config.embedding_model)
+    console.print(table)
+
+
+def create_new_config(cwd: Path, default_name: str):
+    """Create a new knowledge base configuration."""
+    console.print(Panel(
+        "➕ Create New Knowledge Base",
+        border_style="green"
+    ))
+    console.print()
 
     # Step 1: Knowledge Base Name
     console.print(Panel(
@@ -356,6 +580,35 @@ def status():
     else:
         console.print("\n[yellow]No index created yet. Run:[/yellow]")
         console.print("  lsearch index")
+
+
+@main.command()
+def list_kbs():
+    """List all configured knowledge bases."""
+    configs = list_existing_configs()
+
+    if not configs:
+        console.print("[yellow]No knowledge bases found.[/yellow]")
+        console.print("Run: lsearch init")
+        return
+
+    display_existing_configs(configs)
+
+
+@main.command()
+@click.argument("name")
+def switch_kb(name: str):
+    """Switch to a different knowledge base by name."""
+    configs = list_existing_configs()
+
+    for path, config in configs:
+        if config.name == name:
+            console.print(f"[green]Switched to knowledge base: {name}[/green]")
+            console.print(f"Location: {path}")
+            return
+
+    console.print(f"[red]Knowledge base '{name}' not found.[/red]")
+    console.print("Run 'lsearch list-kbs' to see available knowledge bases.")
 
 
 @main.command()
