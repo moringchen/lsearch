@@ -122,7 +122,7 @@ def run_interactive_init():
 
         # Ask what to do
         action = questionary.select(
-            "What would you like to do?",
+            "What would you like to do? (Use ↑↓ arrow keys, Enter to select)",
             choices=[
                 questionary.Choice(
                     "➕  Create NEW knowledge base",
@@ -217,7 +217,7 @@ def run_modify_config(config_path: Path, config: Config):
 
     # What to modify
     field_to_modify = questionary.select(
-        "What would you like to modify?",
+        "What would you like to modify? (Use ↑↓ arrow keys)",
         choices=[
             questionary.Choice("Name", value="name"),
             questionary.Choice("Documentation Paths", value="paths"),
