@@ -37,6 +37,7 @@ dependencies = [
     "networkx>=3.0",
     "click>=8.0.0",
     "rich>=13.0.0",
+    "questionary>=2.0.0",
 ]
 
 [project.optional-dependencies]

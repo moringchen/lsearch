@@ -4,8 +4,11 @@ import sys
 from pathlib import Path
 
 import click
+import questionary
 from rich.console import Console
 from rich.table import Table
+from rich.panel import Panel
+from rich.text import Text
 
 from lsearch.config import Config, PathConfig
 from lsearch.server import main as server_main
@@ -44,6 +47,205 @@ def generate_kb_name(cwd: Path) -> str:
     return name
 
 
+def run_interactive_init():
+    """Run interactive initialization wizard using questionary."""
+    cwd = Path.cwd()
+    default_name = generate_kb_name(cwd)
+
+    # Header
+    console.print()
+    console.print(Panel(
+        Text("🚀 Welcome to lsearch Setup Wizard", justify="center", style="bold cyan"),
+        subtitle="Interactive Knowledge Base Configuration",
+        border_style="cyan"
+    ))
+    console.print(f"\n📁 Current directory: [dim]{cwd}[/dim]\n")
+
+    # Check if already initialized
+    existing_config = Config.get_project_config_dir()
+    if existing_config:
+        console.print(f"[yellow]⚠️  lsearch is already initialized in this project.[/yellow]")
+        console.print(f"   Config file: [dim]{existing_config}/config.yaml[/dim]\n")
+
+        reinit = questionary.confirm(
+            "Do you want to re-initialize with new settings?",
+            default=False
+        ).ask()
+
+        if not reinit:
+            console.print("\n[dim]Cancelled. Existing configuration preserved.[/dim]")
+            return
+        console.print()
+
+    # Step 1: Knowledge Base Name
+    console.print(Panel(
+        "Step 1/4: Knowledge Base Name",
+        border_style="blue"
+    ))
+
+    name = questionary.text(
+        "What would you like to name your knowledge base?",
+        default=default_name,
+        instruction="This identifies your documentation collection"
+    ).ask()
+
+    if not name:
+        name = default_name
+    console.print(f"[green]✓[/green] Name: [cyan]{name}[/cyan]\n")
+
+    # Step 2: Documentation Paths
+    console.print(Panel(
+        "Step 2/4: Documentation Paths",
+        border_style="blue"
+    ))
+
+    path_options = [
+        "./docs (Documentation folder - RECOMMENDED)",
+        "./README.md (Main readme file)",
+        "./src (Source code directory)",
+        "Multiple paths (custom)",
+    ]
+
+    selected_paths = questionary.checkbox(
+        "Select directories/files to index (use ↑↓ to navigate, Space to select, Enter to confirm):",
+        choices=path_options,
+        default=[path_options[0]]
+    ).ask()
+
+    if not selected_paths:
+        selected_paths = ["./docs (Documentation folder - RECOMMENDED)"]
+
+    # Parse selected paths
+    paths = []
+    for p in selected_paths:
+        if p.startswith("./docs"):
+            paths.append("./docs")
+        elif p.startswith("./README"):
+            paths.append("./README.md")
+        elif p.startswith("./src"):
+            paths.append("./src")
+        elif p.startswith("Multiple"):
+            # Custom paths
+            custom = questionary.text(
+                "Enter paths separated by commas:",
+                default="./docs,./README.md",
+                instruction="Example: ./docs,./README.md,./notes"
+            ).ask()
+            if custom:
+                paths.extend([p.strip() for p in custom.split(",")])
+
+    # Remove duplicates while preserving order
+    seen = set()
+    paths = [p for p in paths if not (p in seen or seen.add(p))]
+
+    console.print(f"[green]✓[/green] Paths: [cyan]{', '.join(paths)}[/cyan]\n")
+
+    # Step 3: Embedding Model
+    console.print(Panel(
+        "Step 3/4: Embedding Model",
+        border_style="blue"
+    ))
+
+    model_choice = questionary.select(
+        "Choose an embedding model for semantic search:",
+        choices=[
+            questionary.Choice(
+                "🌏  bge-small-zh  ~300MB  [Chinese-optimized, Best for Chinese docs]",
+                value="bge-small-zh"
+            ),
+            questionary.Choice(
+                "🇬🇧  all-MiniLM-L6-v2  ~70MB  [Small & fast, English general purpose]",
+                value="all-MiniLM-L6-v2"
+            ),
+            questionary.Choice(
+                "🇬🇧  bge-small-en  ~130MB  [English-optimized]",
+                value="bge-small-en"
+            ),
+        ],
+        default="bge-small-zh"
+    ).ask()
+
+    model = model_choice or "bge-small-zh"
+    console.print(f"[green]✓[/green] Model: [cyan]{model}[/cyan]\n")
+
+    # Step 4: Confirmation
+    console.print(Panel(
+        "Step 4/4: Confirm Configuration",
+        border_style="blue"
+    ))
+
+    summary = f"""[bold]Configuration Summary:[/bold]
+
+  Knowledge Base Name: [cyan]{name}[/cyan]
+  Documentation Paths: [cyan]{', '.join(paths)}[/cyan]
+  Embedding Model:     [cyan]{model}[/cyan]
+  Config Location:     [dim]{cwd}/.lsearch/config.yaml[/dim]
+"""
+    console.print(summary)
+
+    confirm = questionary.confirm(
+        "Create this configuration?",
+        default=True
+    ).ask()
+
+    if not confirm:
+        console.print("\n[dim]Cancelled. No changes made.[/dim]")
+        return
+
+    # Create configuration
+    try:
+        config = Config(
+            name=name,
+            paths=[PathConfig(path=p, session_only=False) for p in paths],
+            embedding_model=model,
+        )
+
+        config_dir = cwd / ".lsearch"
+        config_dir.mkdir(parents=True, exist_ok=True)
+        config_file = config_dir / "config.yaml"
+
+        config.to_file(config_file)
+
+        # Success message
+        console.print()
+        console.print(Panel(
+            Text("✅ lsearch initialized successfully!", justify="center", style="bold green"),
+            border_style="green"
+        ))
+
+        console.print(f"""
+[bold]📋 Configuration:[/bold]
+  Knowledge base name: [cyan]{name}[/cyan]
+  Documentation paths: [cyan]{', '.join(paths)}[/cyan]
+  Embedding model:     [cyan]{model}[/cyan]
+  Config file:         [dim]{config_file}[/dim]
+
+[bold]🚀 Next Steps:[/bold]
+  1. Create your documentation directory:
+     [dim]mkdir -p {' '.join(paths)}[/dim]
+
+  2. Add markdown files to your docs
+
+  3. Index your documents (in Claude Code):
+     [dim]/lsearch-index[/dim]
+
+  4. Start searching:
+     [dim]/lsearch your search query[/dim]
+
+[bold]📚 Available Commands:[/bold]
+  • /lsearch <query>      Search knowledge base
+  • /lsearch-index        Index documents
+  • /lsearch-fetch <url>  Fetch and index web page
+  • /lsearch-add <path>   Add temporary path
+  • /lsearch-stats        Show statistics
+  • /kb <query>           Force search knowledge base
+""")
+
+    except Exception as e:
+        console.print(f"\n[red]❌ Error creating configuration: {e}[/red]")
+        console.print("[dim]Please check permissions and try again.[/dim]")
+
+
 @main.command()
 @click.option(
     "--name",
@@ -61,14 +263,24 @@ def generate_kb_name(cwd: Path) -> str:
     type=click.Choice(["bge-small-zh", "all-MiniLM-L6-v2", "bge-small-en"]),
     help="Embedding model to use",
 )
-def init(name: str | None, path: tuple, model: str):
+@click.option(
+    "--interactive/--no-interactive",
+    default=True,
+    help="Use interactive wizard (default: True)",
+)
+def init(name: str | None, path: tuple, model: str, interactive: bool):
     """Initialize a new knowledge base configuration."""
-    # Auto-generate name from current directory if not provided
+
+    # Use interactive wizard by default
+    if interactive:
+        run_interactive_init()
+        return
+
+    # Non-interactive mode (for scripting)
     if name is None:
         cwd = Path.cwd()
         name = generate_kb_name(cwd)
 
-    # Use default path if not provided
     paths = list(path) if path else ["./docs"]
 
     config = Config(
@@ -77,7 +289,6 @@ def init(name: str | None, path: tuple, model: str):
         embedding_model=model,
     )
 
-    # Save to current directory
     config_dir = Path(".lsearch")
     config_dir.mkdir(exist_ok=True)
     config_file = config_dir / "config.yaml"
