@@ -1,58 +1,36 @@
 name: lsearch-init-wizard
-description: Interactive wizard for initializing lsearch knowledge base with form-based selection
+description: Initialize or reconfigure lsearch knowledge base with form-based configuration
 
 When user runs /lsearch-init or says "initialize lsearch":
 
-1. Check if already initialized by looking for .lsearch/config.yaml
+1. Check if already initialized by looking for .lsearch/config.yaml in current working directory
 
-2. If already initialized, show current config and ask if they want to reconfigure
+2. If initialized, show current configuration and let user choose to modify or keep:
 
-3. If not initialized, use AskUserQuestion to collect configuration:
+   - Read the config file to get current settings
+   - Call mcp__lsearch__list_paths to show configured paths
+   - Call mcp__lsearch__get_stats to show index statistics
 
-   Step 1 - Knowledge Base Name:
+   Then ask user with AskUserQuestion:
    AskUserQuestion({
      questions: [{
-       question: "What would you like to name your knowledge base?",
-       header: "Name",
+       question: "Knowledge base already exists. What would you like to do?",
+       header: "Action",
        options: [
-         {label: "Auto-generate from directory name", description: "Use current directory name"},
-         {label: "Custom name", description: "Enter your own name"}
+         {label: "Keep current configuration", description: "No changes needed"},
+         {label: "Modify configuration", description: "Update name, paths, or model via form"}
        ]
      }]
    })
 
-   If custom name selected, ask for text input
+3. If user chooses "Modify configuration" or if not initialized:
 
-   Step 2 - Documentation Paths (multi-select):
-   AskUserQuestion({
-     questions: [{
-       question: "Which directories would you like to index?",
-       header: "Paths",
-       multiSelect: true,
-       options: [
-         {label: "./docs", description: "Documentation folder (recommended)"},
-         {label: "./README.md", description: "Main readme file"},
-         {label: "./src", description: "Source code directory"},
-         {label: "./wiki", description: "Wiki directory"},
-         {label: "./notes", description: "Notes directory"},
-         {label: "Custom path", description: "Enter a custom path"}
-       ]
-     }]
-   })
+   Call mcp__lsearch__init with force=true to show the configuration form:
+   - Name: Auto-generated or custom
+   - Paths: Multi-select checkboxes for common paths + custom paths field
+   - Model: Dropdown selection
+   - Force Reinitialize: true (to overwrite existing)
 
-   Step 3 - Embedding Model:
-   AskUserQuestion({
-     questions: [{
-       question: "Which embedding model would you like to use?",
-       header: "Model",
-       options: [
-         {label: "bge-small-zh", description: "~300MB - Best for Chinese documents (recommended for Chinese)"},
-         {label: "all-MiniLM-L6-v2", description: "~70MB - Small & fast, English general purpose"},
-         {label: "bge-small-en", description: "~130MB - Optimized for English documents"}
-       ]
-     }]
-   })
-
-4. After collecting all inputs, call the mcp__lsearch__init tool with the collected parameters
-
-5. Show success message with next steps
+4. After successful initialization, show success message and suggest next steps:
+   - Run /lsearch-index to index documents
+   - Run /lsearch <query> to start searching

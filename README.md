@@ -88,11 +88,17 @@ In **Claude Code**, run:
 /lsearch-init
 ```
 
-This displays an interactive form where you can:
+This displays an **interactive form** where you can:
 - **Name** - Enter a knowledge base name
-- **Paths** - Select which directories to index (checkboxes)
-- **Model** - Choose an embedding model (dropdown)
+- **Paths** - Select directories to index (checkbox selection)
+- **Model** - Choose an embedding model (dropdown selection)
 - **Custom Paths** - Add additional paths if needed
+- **Force Reinitialize** - Overwrite existing configuration (shown when already initialized)
+
+**If already initialized:**
+- Current configuration is displayed (name, paths, model)
+- Choose to keep current settings or modify via the form
+- Check "Force Reinitialize" to update configuration
 
 This creates `.lsearch/config.yaml` in your project directory.
 

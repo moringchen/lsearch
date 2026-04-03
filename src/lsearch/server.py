@@ -75,6 +75,12 @@ async def list_tools() -> list[Tool]:
                         "title": "Custom Paths (Optional)",
                         "description": "Additional custom paths, comma-separated (e.g., ./api-docs,./guides)",
                     },
+                    "force": {
+                        "type": "boolean",
+                        "title": "Force Reinitialize",
+                        "description": "Overwrite existing configuration if it exists",
+                        "default": False,
+                    },
                 },
                 "required": ["name", "paths", "model"],
             },
@@ -253,19 +259,40 @@ async def _handle_init(arguments: dict) -> list[TextContent]:
 
     # Check if already initialized
     existing_config_dir = Config.get_project_config_dir()
+    force = arguments.get("force", False)
 
-    if existing_config_dir:
-        return [TextContent(
-            type="text",
-            text=f"""lsearch is already initialized in this project.
+    if existing_config_dir and not force:
+        # Load existing config to show current settings
+        try:
+            existing_config = Config.from_file(existing_config_dir / "config.yaml")
+            paths_display = ", ".join([p.path for p in existing_config.paths])
+            return [TextContent(
+                type="text",
+                text=f"""lsearch is already initialized in this project.
+
+Current Configuration:
+  Name:  {existing_config.name}
+  Paths: {paths_display}
+  Model: {existing_config.embedding_model}
+  File:  {existing_config_dir}/config.yaml
+
+To re-initialize with different settings, run with force option:
+```
+/lsearch-init (with "Force Reinitialize" enabled)
+```"""
+            )]
+        except Exception:
+            return [TextContent(
+                type="text",
+                text=f"""lsearch is already initialized in this project.
 
 Configuration file: `{existing_config_dir}/config.yaml`
 
-To re-initialize with different settings, delete the config first:
+To re-initialize with different settings, run with force option:
 ```
-/lsearch-init --force
+/lsearch-init (with "Force Reinitialize" enabled)
 ```"""
-        )]
+            )]
 
     cwd = Path.cwd()
 

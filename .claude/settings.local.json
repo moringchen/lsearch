@@ -74,7 +74,8 @@
       "Bash(pytest tests/test_cli.py -v --tb=short)",
       "Bash(rm:*)",
       "Bash(twine upload:*)",
-      "Bash(npm whoami:*)"
+      "Bash(npm whoami:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
