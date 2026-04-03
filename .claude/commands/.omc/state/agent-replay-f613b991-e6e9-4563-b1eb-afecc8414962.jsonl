@@ -1,4 +1,0 @@
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"lsearch"}
-{"t":0,"agent":"a1c2292","agent_type":"architect","event":"agent_start","parent_mode":"none"}
-{"t":0,"agent":"a1c2292","agent_type":"architect","event":"agent_stop","success":true,"duration_ms":162113}
-{"t":0,"agent":"system","event":"skill_invoked","skill_name":"oh-my-claudecode:cancel"}

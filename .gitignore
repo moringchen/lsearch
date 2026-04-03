@@ -63,3 +63,4 @@ chroma/
 *.bin
 *.safetensors
 models/
+.omc/

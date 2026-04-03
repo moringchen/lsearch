@@ -1,7 +1,0 @@
-{
-  "tool_name": "Glob",
-  "tool_input_preview": "{\"pattern\":\".claude/commands/*.md\",\"path\":\"/Users/moringchen/workspace/ai/skills/locrag\"}",
-  "error": "spawn /Users/moringchen/.nvm/versions/node/v24.13.0/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/x64-darwin/rg EACCES",
-  "timestamp": "2026-04-01T09:26:05.796Z",
-  "retry_count": 1
-}
