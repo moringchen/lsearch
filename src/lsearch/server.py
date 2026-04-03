@@ -37,30 +37,24 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "Knowledge base name (default: auto-generated from directory)",
+                        "description": "Knowledge base name (auto-generated from directory if not provided)",
                     },
                     "paths": {
                         "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Paths to include in the knowledge base (default: ['./docs'])",
+                        "items": {"type": "string", "enum": ["./docs", "./README.md", "./src", "./notes", "./wiki"]},
+                        "description": "Select paths to include in the knowledge base",
                     },
                     "model": {
                         "type": "string",
                         "enum": ["bge-small-zh", "all-MiniLM-L6-v2", "bge-small-en"],
                         "description": "Embedding model to use",
-                        "default": "bge-small-zh",
                     },
-                    "confirm": {
-                        "type": "boolean",
-                        "description": "Confirm and create configuration",
-                        "default": False,
-                    },
-                    "force": {
-                        "type": "boolean",
-                        "description": "Force re-initialization even if already configured",
-                        "default": False,
+                    "custom_paths": {
+                        "type": "string",
+                        "description": "Additional custom paths (comma-separated, optional)",
                     },
                 },
+                "required": ["name", "paths", "model"],
             },
         ),
         Tool(
@@ -185,17 +179,9 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             type="text",
             text="""⚠️ lsearch is not initialized in this project.
 
-Please run `lsearch init` in your terminal first to set up the knowledge base.
+Please run `/lsearch-init` first to set up the knowledge base.
 
-This will launch an interactive TUI where you can configure:
-  • Knowledge base name
-  • Documentation paths to index
-  • Embedding model
-
-The configuration will be saved to `.lsearch/config.yaml` in your project directory.
-
-Or use non-interactive mode:
-  lsearch init --no-interactive --name my-project --path ./docs"""
+This will create a `.lsearch/config.yaml` file in your project directory."""
         )]
 
     # Initialize on first call (after checking initialization)
@@ -240,166 +226,58 @@ def _init_config() -> None:
 
 
 async def _handle_init(arguments: dict) -> list[TextContent]:
-    """Handle init tool - redirects users to terminal TUI."""
+    """Handle init tool - create configuration from MCP parameters."""
     global _config, _searcher, _processor, _builder, _project_dir
 
     # Check if already initialized
-    force = arguments.get("force", False)
     existing_config_dir = Config.get_project_config_dir()
 
-    if existing_config_dir and not force:
+    if existing_config_dir:
         return [TextContent(
             type="text",
-            text=f"""✅ lsearch is already initialized in this project.
+            text=f"""lsearch is already initialized in this project.
 
 Configuration file: `{existing_config_dir}/config.yaml`
 
-To re-initialize with different settings, delete the config and run:
-```bash
-rm -rf {existing_config_dir}
-lsearch init
+To re-initialize with different settings, delete the config first:
+```
+/lsearch-init --force
 ```"""
         )]
 
     cwd = Path.cwd()
-    default_name = cwd.name
-    parent = cwd.parent
-    if parent.name and parent != cwd:
-        default_name = f"{parent.name}-{cwd.name}"
 
-    # Check which step we're on based on provided arguments
+    # Get parameters from arguments
     name = arguments.get("name")
-    paths = arguments.get("paths")
-    model = arguments.get("model")
-    confirm = arguments.get("confirm", False)
+    paths = arguments.get("paths", ["./docs"])
+    model = arguments.get("model", "bge-small-zh")
+    custom_paths = arguments.get("custom_paths", "")
 
-    # If running with confirm flag, actually create the config
-    if confirm and name and paths and model:
-        # Parse paths
-        if isinstance(paths, str):
-            paths_list = [p.strip() for p in paths.split(",")]
-        elif isinstance(paths, list):
-            paths_list = paths
-        else:
-            paths_list = ["./docs"]
+    # Use default name if not provided
+    if not name:
+        name = cwd.name
+        parent = cwd.parent
+        if parent.name and parent != cwd:
+            name = f"{parent.name}-{name}"
 
-        # Final step: Create configuration
-        try:
-            config = Config(
-                name=name,
-                paths=[PathConfig(path=p, session_only=False) for p in paths_list],
-                embedding_model=model,
-            )
+    # Parse paths
+    if isinstance(paths, str):
+        paths_list = [p.strip() for p in paths.split(",") if p.strip()]
+    elif isinstance(paths, list):
+        paths_list = paths
+    else:
+        paths_list = ["./docs"]
 
-            # Save to current directory
-            config_dir = cwd / ".lsearch"
-            config_dir.mkdir(parents=True, exist_ok=True)
-            config_file = config_dir / "config.yaml"
+    # Add custom paths if provided
+    if custom_paths:
+        custom_list = [p.strip() for p in custom_paths.split(",") if p.strip()]
+        paths_list.extend(custom_list)
 
-            config.to_file(config_file)
+    # Remove duplicates while preserving order
+    seen = set()
+    paths_list = [p for p in paths_list if not (p in seen or seen.add(p))]
 
-            # Initialize global state
-            _project_dir = config_dir
-            _config = config
-            _searcher = HybridSearcher(_config, _project_dir)
-            _processor = DocumentProcessor(_config)
-            _builder = ContextBuilder(_config)
-
-            paths_display_final = "\n".join(f"    • {p}" for p in paths_list)
-            return [TextContent(
-                type="text",
-                text=f"""✅ lsearch initialized successfully!
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Configuration Created
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 Settings:
-    Knowledge base name: {name}
-    Documentation paths:
-{paths_display_final}
-    Embedding model: {model}
-    Config file: {config_file}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Next Steps
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1️⃣  Create your documentation directory:
-    ```bash
-    mkdir -p {' '.join(paths_list)}
-    ```
-
-2️⃣  Add markdown files to your docs
-
-3️⃣  Index your documents:
-    ```
-    /lsearch-index
-    ```
-
-4️⃣  Start searching:
-    ```
-    /lsearch your search query
-    ```
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Available Commands
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• /lsearch <query>     - Search knowledge base
-• /lsearch-index       - Index documents
-• /lsearch-fetch <url> - Fetch and index web page
-• /lsearch-add <path>  - Add temporary path
-• /lsearch-stats       - Show statistics
-• /kb <query>          - Force search knowledge base"""
-            )]
-        except Exception as e:
-            return [TextContent(
-                type="text",
-                text=f"❌ Error creating configuration: {e}\n\nPlease try again or check permissions."
-            )]
-
-    # Otherwise, recommend terminal TUI
-    return [TextContent(
-        type="text",
-        text=f"""🚀 Welcome to lsearch setup!
-
-💡 **Recommended: Use the terminal TUI for best experience**
-
-Run this in your terminal (not in Claude Code):
-```bash
-lsearch init
-```
-
-This launches an interactive TUI with keyboard navigation:
-  • ↑↓ to navigate
-  • Space to select
-  • Enter to confirm
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Quick Init (Non-interactive)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Or use the quick non-interactive mode:
-```bash
-lsearch init --no-interactive --name {default_name} --path ./docs --model bge-small-zh
-```
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MCP Tool Init (Advanced)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Alternatively, you can use the MCP init tool with parameters:
-```
-/init --name {default_name} --paths ./docs --model bge-small-zh --confirm
-```
-
-Available models:
-  • `bge-small-zh` - Chinese-optimized (~300MB)
-  • `all-MiniLM-L6-v2` - English general purpose (~70MB)
-  • `bge-small-en` - English-optimized (~130MB)"""
-    )]
-
-    # Final step: Create configuration
+    # Create configuration
     try:
         config = Config(
             name=name,
@@ -421,57 +299,27 @@ Available models:
         _processor = DocumentProcessor(_config)
         _builder = ContextBuilder(_config)
 
-        paths_display_final = "\n".join(f"    • {p}" for p in paths_list)
+        paths_display = ", ".join(paths_list)
         return [TextContent(
             type="text",
-            text=f"""✅ lsearch initialized successfully!
+            text=f"""lsearch initialized successfully!
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Configuration Created
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Configuration:
+  Name:  {name}
+  Paths: {paths_display}
+  Model: {model}
+  File:  {config_file}
 
-📋 Settings:
-    Knowledge base name: {name}
-    Documentation paths:
-{paths_display_final}
-    Embedding model: {model}
-    Config file: {config_file}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Next Steps
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1️⃣  Create your documentation directory:
-    ```bash
-    mkdir -p {' '.join(paths_list)}
-    ```
-
-2️⃣  Add markdown files to your docs
-
-3️⃣  Index your documents:
-    ```
-    /lsearch-index
-    ```
-
-4️⃣  Start searching:
-    ```
-    /lsearch your search query
-    ```
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Available Commands
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• /lsearch <query>     - Search knowledge base
-• /lsearch-index       - Index documents
-• /lsearch-fetch <url> - Fetch and index web page
-• /lsearch-add <path>  - Add temporary path
-• /lsearch-stats       - Show statistics
-• /kb <query>          - Force search knowledge base"""
+Next steps:
+  1. Create directories: mkdir -p {' '.join(paths_list)}
+  2. Add markdown files
+  3. Index documents: /lsearch-index
+  4. Start searching: /lsearch your query"""
         )]
     except Exception as e:
         return [TextContent(
             type="text",
-            text=f"❌ Error creating configuration: {e}\n\nPlease try again or check permissions."
+            text=f"Error creating configuration: {e}\n\nPlease try again."
         )]
 
 async def _handle_search(arguments: dict) -> list[TextContent]:
