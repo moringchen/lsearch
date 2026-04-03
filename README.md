@@ -78,36 +78,27 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-### 1. Initialize Knowledge Base (Terminal Interactive TUI)
+### 1. Initialize Knowledge Base (In Claude Code)
 
 **⚠️ IMPORTANT: You must initialize lsearch before using it!**
 
-Open your **local terminal** (not Claude Code) and run:
+In **Claude Code**, run:
 
-```bash
-lsearch init
+```
+/lsearch-init
 ```
 
-This launches an interactive TUI with keyboard navigation:
-
-| Key | Action |
-|-----|--------|
-| ↑ ↓ | Navigate up/down |
-| Space | Select/deselect (checkbox) |
-| Enter | Confirm selection |
-| Ctrl+C | Cancel |
-
-**Configuration steps:**
-1. **Knowledge Base Name** - Edit or accept the suggested name
-2. **Documentation Paths** - Select paths to index (Space to toggle)
-3. **Embedding Model** - Choose from 3 models (↑↓ to navigate)
-4. **Confirm & Create** - Review settings and create config
+This displays an interactive form where you can:
+- **Name** - Enter a knowledge base name
+- **Paths** - Select which directories to index (checkboxes)
+- **Model** - Choose an embedding model (dropdown)
+- **Custom Paths** - Add additional paths if needed
 
 This creates `.lsearch/config.yaml` in your project directory.
 
-**Quick init with defaults (no TUI):**
+**Or use CLI in terminal:**
 ```bash
-lsearch init --no-interactive --name my-project --path ./docs --model bge-small-zh
+lsearch init --name my-project --path ./docs --model bge-small-zh
 ```
 
 ### 2. Index Your Documents
@@ -141,6 +132,7 @@ Once initialized (via `lsearch init` in terminal), use these triggers in Claude 
 
 | Trigger | Description | Example |
 |---------|-------------|---------|
+| `/lsearch-init` | **Initialize knowledge base (MUST run first)** | `/lsearch-init` |
 | `lsearch: <query>` | Automatic RAG search | `lsearch: How does auth work?` |
 | `@kb <query>` | Force knowledge base search | `@kb deployment process` |
 | `/lsearch <query>` | Search via slash command | `/lsearch API documentation` |
@@ -250,8 +242,9 @@ lsearch server
 # Navigate to your project
 cd ~/projects/my-web-app
 
-# Step 1: Initialize lsearch (in terminal)
-lsearch init
+# Step 1: Initialize lsearch (in Claude Code)
+/lsearch-init
+# Follow the interactive form to configure name, paths, and model
 
 # Create docs directory and add files
 mkdir -p docs
@@ -267,11 +260,15 @@ lsearch: How do I deploy this project?
 
 ### Example 2: Multi-language Project
 
-```bash
-# Initialize with Chinese-optimized model (default)
-lsearch init --name backend-api
+In Claude Code:
+```
+/lsearch-init
+# Select paths: ./backend/docs, ./frontend/docs, ./README.md
+# Select model: bge-small-zh
+```
 
-# Add multiple documentation paths
+Or use CLI:
+```bash
 lsearch init --name fullstack \
   --path ./backend/docs \
   --path ./frontend/docs \

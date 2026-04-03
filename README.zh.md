@@ -79,36 +79,27 @@ pip install -e ".[dev]"
 
 ## 快速开始
 
-### 1. 初始化知识库（终端交互式 TUI）
+### 1. 初始化知识库（在 Claude Code 中）
 
 **⚠️ 重要：必须先初始化 lsearch 才能使用！**
 
-在**本地终端**（不是 Claude Code）中运行：
+在 **Claude Code** 中运行：
 
-```bash
-lsearch init
+```
+/lsearch-init
 ```
 
-这将启动一个带键盘导航的交互式 TUI：
-
-| 按键 | 操作 |
-|-----|------|
-| ↑ ↓ | 上下导航 |
-| 空格 | 选择/取消（复选框）|
-| 回车 | 确认选择 |
-| Ctrl+C | 取消 |
-
-**配置步骤：**
-1. **知识库名称** - 编辑或接受建议的名称
-2. **文档路径** - 选择要索引的路径（空格切换）
-3. **嵌入模型** - 从 3 个模型中选择（↑↓ 导航）
-4. **确认创建** - 查看设置并创建配置
+这将显示一个交互式表单，你可以：
+- **名称** - 输入知识库名称
+- **路径** - 选择要索引的目录（复选框）
+- **模型** - 选择嵌入模型（下拉菜单）
+- **自定义路径** - 添加额外的路径（可选）
 
 这将在项目目录中创建 `.lsearch/config.yaml` 配置文件。
 
-**使用默认值快速初始化（无 TUI）：**
+**或者在终端使用 CLI：**
 ```bash
-lsearch init --no-interactive --name my-project --path ./docs --model bge-small-zh
+lsearch init --name my-project --path ./docs --model bge-small-zh
 ```
 
 ### 2. 索引文档
