@@ -1,0 +1,58 @@
+name: lsearch-init-wizard
+description: Interactive wizard for initializing lsearch knowledge base with form-based selection
+
+When user runs /lsearch-init or says "initialize lsearch":
+
+1. Check if already initialized by looking for .lsearch/config.yaml
+
+2. If already initialized, show current config and ask if they want to reconfigure
+
+3. If not initialized, use AskUserQuestion to collect configuration:
+
+   Step 1 - Knowledge Base Name:
+   AskUserQuestion({
+     questions: [{
+       question: "What would you like to name your knowledge base?",
+       header: "Name",
+       options: [
+         {label: "Auto-generate from directory name", description: "Use current directory name"},
+         {label: "Custom name", description: "Enter your own name"}
+       ]
+     }]
+   })
+
+   If custom name selected, ask for text input
+
+   Step 2 - Documentation Paths (multi-select):
+   AskUserQuestion({
+     questions: [{
+       question: "Which directories would you like to index?",
+       header: "Paths",
+       multiSelect: true,
+       options: [
+         {label: "./docs", description: "Documentation folder (recommended)"},
+         {label: "./README.md", description: "Main readme file"},
+         {label: "./src", description: "Source code directory"},
+         {label: "./wiki", description: "Wiki directory"},
+         {label: "./notes", description: "Notes directory"},
+         {label: "Custom path", description: "Enter a custom path"}
+       ]
+     }]
+   })
+
+   Step 3 - Embedding Model:
+   AskUserQuestion({
+     questions: [{
+       question: "Which embedding model would you like to use?",
+       header: "Model",
+       options: [
+         {label: "bge-small-zh", description: "~300MB - Best for Chinese documents (recommended for Chinese)"},
+         {label: "all-MiniLM-L6-v2", description: "~70MB - Small & fast, English general purpose"},
+         {label: "bge-small-en", description: "~130MB - Optimized for English documents"}
+       ]
+     }]
+   })
+
+4. After collecting all inputs, call the mcp__lsearch__init tool with the collected parameters
+
+5. Show success message with next steps

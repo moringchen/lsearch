@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"lsearch status 2>&1\",\"description\":\"Get full error message from lsearch status\"}",
-  "error": "Exit code 1\n/opt/miniconda3/lib/python3.10/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.0.1)/charset_normalizer (3.4.6) doesn't match a supported version!\n  warnings.warn(\nTraceback (most recent call last):\n  File \"/opt/miniconda3/bin/lsearch\", line 8, in <module>\n    sys.exit(main())\n  File \"/opt/miniconda3/lib/python3.10/site-packages/click/core.py\", line 1442, in __call__\n    return self.main(*args, **kwargs)\n  File \"/opt/miniconda3/lib/pyth...",
-  "timestamp": "2026-03-25T10:07:43.550Z",
-  "retry_count": 1
-}

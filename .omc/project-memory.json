@@ -1,9 +1,17 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1774424975563,
+  "lastScanned": 1775203892754,
   "projectRoot": "/Users/moringchen/workspace/ai/skills/locrag",
   "techStack": {
     "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": ">=14.0.0",
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
       {
         "name": "Python",
         "version": null,
@@ -20,15 +28,18 @@
         "category": "testing"
       }
     ],
-    "packageManager": null,
-    "runtime": null
+    "packageManager": "npm",
+    "runtime": "Node.js 14.0.0"
   },
   "build": {
     "buildCommand": null,
     "testCommand": "pytest",
     "lintCommand": "ruff check",
     "devCommand": null,
-    "scripts": {}
+    "scripts": {
+      "postinstall": "node install.js",
+      "install:lsearch": "node install.js"
+    }
   },
   "conventions": {
     "namingStyle": null,
@@ -41,114 +52,112 @@
     "workspaces": [],
     "mainDirectories": [
       "src",
+      "test",
       "tests"
     ],
     "gitBranches": null
   },
   "customNotes": [],
   "directoryMap": {
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 2,
+      "lastAccessed": 1775203892385,
+      "keyFiles": [
+        "lsearch-0.2.0-py3-none-any.whl",
+        "lsearch-0.2.0.tar.gz"
+      ]
+    },
+    "example-marketplace": {
+      "path": "example-marketplace",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1775203892393,
+      "keyFiles": [
+        "README.md"
+      ]
+    },
+    "skills-submission": {
+      "path": "skills-submission",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1775203892393,
+      "keyFiles": [
+        "SUBMISSION.md"
+      ]
+    },
     "src": {
       "path": "src",
       "purpose": "Source code",
       "fileCount": 0,
-      "lastAccessed": 1774424975390,
+      "lastAccessed": 1775203892394,
       "keyFiles": []
+    },
+    "test": {
+      "path": "test",
+      "purpose": "Test files",
+      "fileCount": 1,
+      "lastAccessed": 1775203892394,
+      "keyFiles": [
+        "test.md"
+      ]
     },
     "tests": {
       "path": "tests",
       "purpose": "Test files",
-      "fileCount": 2,
-      "lastAccessed": 1774424975390,
+      "fileCount": 4,
+      "lastAccessed": 1775203892394,
       "keyFiles": [
         "__init__.py",
-        "test_config.py"
+        "test_cli.py",
+        "test_config.py",
+        "test_document_processor.py"
       ]
     }
   },
   "hotPaths": [
     {
-      "path": "README.md",
-      "accessCount": 16,
-      "lastAccessed": 1774430228162,
-      "type": "file"
-    },
-    {
-      "path": "README.zh.md",
-      "accessCount": 15,
-      "lastAccessed": 1774430160841,
-      "type": "file"
-    },
-    {
-      "path": "CLAUDE.md",
-      "accessCount": 8,
-      "lastAccessed": 1774428281576,
-      "type": "file"
-    },
-    {
-      "path": ".claude/skills/lsearch/SKILL.md",
-      "accessCount": 7,
-      "lastAccessed": 1774430138181,
-      "type": "file"
-    },
-    {
-      "path": "src/lsearch/config.py",
-      "accessCount": 5,
-      "lastAccessed": 1774433362963,
-      "type": "file"
-    },
-    {
-      "path": "skills-submission/SUBMISSION.md",
-      "accessCount": 4,
-      "lastAccessed": 1774431338812,
+      "path": "src/lsearch/server.py",
+      "accessCount": 3,
+      "lastAccessed": 1775207183487,
       "type": "file"
     },
     {
       "path": ".lsearch/config.yaml",
-      "accessCount": 4,
-      "lastAccessed": 1774433281290,
+      "accessCount": 2,
+      "lastAccessed": 1775206199768,
       "type": "file"
     },
     {
-      "path": "src/lsearch/cli.py",
-      "accessCount": 3,
-      "lastAccessed": 1774428669349,
-      "type": "file"
-    },
-    {
-      "path": "example-marketplace/README.md",
-      "accessCount": 3,
-      "lastAccessed": 1774431362441,
-      "type": "file"
-    },
-    {
-      "path": "docs/test.md",
-      "accessCount": 3,
-      "lastAccessed": 1774432228215,
+      "path": "README.md",
+      "accessCount": 1,
+      "lastAccessed": 1775206207675,
       "type": "file"
     },
     {
       "path": "pyproject.toml",
       "accessCount": 1,
-      "lastAccessed": 1774427261867,
+      "lastAccessed": 1775206349583,
       "type": "file"
     },
     {
-      "path": ".claude-plugin/marketplace.json",
+      "path": ".claude/skills/lsearch/skill.yaml",
       "accessCount": 1,
-      "lastAccessed": 1774429356798,
+      "lastAccessed": 1775206598092,
       "type": "file"
     },
     {
-      "path": "example-marketplace/.claude-plugin/marketplace.json",
+      "path": ".claude/commands/lsearch-init.md",
       "accessCount": 1,
-      "lastAccessed": 1774430680597,
+      "lastAccessed": 1775206609436,
       "type": "file"
     },
     {
-      "path": "docs",
+      "path": ".claude/skills/lsearch-init-wizard/skill.yaml",
       "accessCount": 1,
-      "lastAccessed": 1774432216596,
-      "type": "directory"
+      "lastAccessed": 1775206843984,
+      "type": "file"
     }
   ],
   "userDirectives": []

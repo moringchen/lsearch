@@ -1,0 +1,17 @@
+{
+  "agents": [
+    {
+      "agent_id": "a1c229263dce93b5e",
+      "agent_type": "oh-my-claudecode:architect",
+      "started_at": "2026-04-01T09:25:49.248Z",
+      "parent_mode": "none",
+      "status": "completed",
+      "completed_at": "2026-04-01T09:28:31.361Z",
+      "duration_ms": 162113
+    }
+  ],
+  "total_spawned": 1,
+  "total_completed": 1,
+  "total_failed": 0,
+  "last_updated": "2026-04-01T09:28:31.465Z"
+}

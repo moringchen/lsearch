@@ -38,7 +38,7 @@ async def list_tools() -> list[Tool]:
                     "name": {
                         "type": "string",
                         "title": "Knowledge Base Name",
-                        "description": "A name to identify this knowledge base (e.g., my-project-docs)",
+                        "description": "A name to identify this knowledge base (auto-generated if empty)",
                     },
                     "paths": {
                         "type": "array",
@@ -55,6 +55,7 @@ async def list_tools() -> list[Tool]:
                                 "Notes directory"
                             ]
                         },
+                        "default": ["./docs"],
                         "uniqueItems": True,
                     },
                     "model": {
@@ -67,6 +68,7 @@ async def list_tools() -> list[Tool]:
                             "all-MiniLM-L6-v2 (~70MB) - Small & fast, English general purpose",
                             "bge-small-en (~130MB) - Optimized for English documents"
                         ],
+                        "default": "bge-small-zh",
                     },
                     "custom_paths": {
                         "type": "string",
