@@ -37,21 +37,41 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "Knowledge base name (auto-generated from directory if not provided)",
+                        "title": "Knowledge Base Name",
+                        "description": "A name to identify this knowledge base (e.g., my-project-docs)",
                     },
                     "paths": {
                         "type": "array",
-                        "items": {"type": "string", "enum": ["./docs", "./README.md", "./src", "./notes", "./wiki"]},
-                        "description": "Select paths to include in the knowledge base",
+                        "title": "Documentation Paths",
+                        "description": "Select directories to include in the knowledge base",
+                        "items": {
+                            "type": "string",
+                            "enum": ["./docs", "./README.md", "./src", "./wiki", "./notes"],
+                            "enumDescriptions": [
+                                "Documentation folder (recommended)",
+                                "Main readme file",
+                                "Source code directory",
+                                "Wiki directory",
+                                "Notes directory"
+                            ]
+                        },
+                        "uniqueItems": True,
                     },
                     "model": {
                         "type": "string",
+                        "title": "Embedding Model",
+                        "description": "Choose an embedding model for semantic search",
                         "enum": ["bge-small-zh", "all-MiniLM-L6-v2", "bge-small-en"],
-                        "description": "Embedding model to use",
+                        "enumDescriptions": [
+                            "bge-small-zh (~300MB) - Best for Chinese documents",
+                            "all-MiniLM-L6-v2 (~70MB) - Small & fast, English general purpose",
+                            "bge-small-en (~130MB) - Optimized for English documents"
+                        ],
                     },
                     "custom_paths": {
                         "type": "string",
-                        "description": "Additional custom paths (comma-separated, optional)",
+                        "title": "Custom Paths (Optional)",
+                        "description": "Additional custom paths, comma-separated (e.g., ./api-docs,./guides)",
                     },
                 },
                 "required": ["name", "paths", "model"],
