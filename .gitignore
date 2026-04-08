@@ -64,3 +64,9 @@ chroma/
 *.safetensors
 models/
 .omc/
+
+# Directories to keep clean from source
+.lsearch/
+tests/
+test/
+docs/
