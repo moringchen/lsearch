@@ -1,7 +1,7 @@
 name: lsearch-init-wizard
-description: Initialize or reconfigure lsearch knowledge base with form-based configuration
+description: Initialize lsearch knowledge base - triggered by natural language like "initialize lsearch" or "setup knowledge base", NOT by /lsearch-init slash command
 
-When user runs /lsearch-init or says "initialize lsearch":
+When user says "initialize lsearch", "setup knowledge base", "create knowledge base", or similar natural language (but NOT when they type /lsearch-init):
 
 1. Check if already initialized by looking for .lsearch/config.yaml in current working directory
 
@@ -34,3 +34,5 @@ When user runs /lsearch-init or says "initialize lsearch":
 4. After successful initialization, show success message and suggest next steps:
    - Run /lsearch-index to index documents
    - Run /lsearch <query> to start searching
+
+Note: For fast MCP form initialization, users should use /lsearch-init slash command directly instead of this skill.

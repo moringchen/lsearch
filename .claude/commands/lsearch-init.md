@@ -1,3 +1,12 @@
+---
+name: lsearch-init
+description: Initialize or reconfigure lsearch knowledge base for the current project
+tools:
+  - mcp__lsearch__init
+  - mcp__lsearch__list_paths
+  - mcp__lsearch__get_stats
+---
+
 # /lsearch-init
 
 Initialize or reconfigure lsearch knowledge base for the current project.
@@ -37,3 +46,8 @@ If already initialized:
 /lsearch-init
 # Follow the interactive form to configure or update your knowledge base
 ```
+
+## Execution
+
+Call mcp__lsearch__init tool directly with empty arguments to show the configuration form.
+If the tool returns a message indicating already initialized, display that message to user.

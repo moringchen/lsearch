@@ -2,6 +2,7 @@
 name: lsearch
 description: Local RAG knowledge base for Claude Code - search your project docs with semantic + keyword hybrid search
 tools:
+  - mcp__lsearch__init
   - mcp__lsearch__search
   - mcp__lsearch__search_with_context
   - mcp__lsearch__index
